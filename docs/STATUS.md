@@ -1,7 +1,7 @@
 # Status: watchdog
 Phase: plan review   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
 Current task: –
-Open PRs: Plan v1 (branch plan/1)
+Open PRs: #1 Plan v1 (plan/1)
 Blockers: –
 Next step: Martin reviews and merges the Plan v1 PR; then `harness` skill (on Sonnet)
 
