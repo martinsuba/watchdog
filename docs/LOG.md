@@ -9,3 +9,6 @@ date | gate/phase | what Martin did | could an agent do it? (y/n + why)
 2026-10-19 | plan gate | Merged Plan v1 PR #1 | n – gate by design
 2026-10-19 | harness | Said no model switching in the Lead session; subagents get the model set explicitly | y – framework could say this by default
 2026-10-19 | harness | Repo setup: Actions enabled, label acceptance-change created, auto-merge enabled | y – done by agent
+2026-10-19 | plan gate | Merged Plan v2 PR #2 | n – gate by design
+2026-10-19 | harness | Said "it is taking too long" about CI (GitHub Actions incident) | y – Lead should check githubstatus and report proactively when a check is pending > 10 min
+2026-10-19 | harness | Approved `acceptance-change` label on harness PR #3 ("label it") | n – gate by design

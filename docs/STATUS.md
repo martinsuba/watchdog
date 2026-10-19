@@ -1,9 +1,9 @@
 # Status: watchdog
-Phase: harness   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
+Phase: harness review   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
 Current task: –
-Open PRs: plan/2 (v2 clarifications)
+Open PRs: #3 Harness (label acceptance-change added; waiting for GitHub Actions, degraded on 2026-10-19)
 Blockers: –
-Next step: harness skill → test-architect subagent (Sonnet) builds skeleton, CI, acceptance tests; harness PR needs Martin's `acceptance-change` label
+Next step: Martin merges #3 when CI is green → Lead sets branch protection → M1 task list → Martin says "go M1"
 
 ## Decisions log
 - 2026-10-16: project created
@@ -15,3 +15,4 @@ Next step: harness skill → test-architect subagent (Sonnet) builds skeleton, C
 - 2026-10-18: production code pinned by release tag, watch files follow origin/main (ARCHITECTURE D-005).
 - 2026-10-19: Plan v1 merged (PR #1). Endurance:ON excluded, Backroad AL excluded, D-005 and "recovered" message confirmed.
 - 2026-10-19: Martin stays on one model in the Lead session; Sonnet-role work runs as subagents with model set explicitly.
+- 2026-10-19: Plan v2 merged (PR #2). Harness PR #3: reviewer round 1 → tests tightened (REQ-003/008), 46 acceptance tests todo-marked.
