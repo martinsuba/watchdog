@@ -7,6 +7,8 @@ export type TestProduct = {
   sizes?: TestSize[];
   /** href of the product link, default /p/<slug of name> */
   href?: string;
+  /** adds class "out-of-stock" to the item (for offers without size elements) */
+  outOfStock?: boolean;
   /** currency symbol, default € */
   symbol?: string;
 };
@@ -36,7 +38,7 @@ export function productHtml(p: TestProduct): string {
     .map((s) => (typeof s === "string" ? { label: s, available: true } : s))
     .map((s) => `<li class="size${s.available ? "" : " unavailable"}">${escapeHtml(s.label)}</li>`)
     .join("");
-  return `<article class="item">
+  return `<article class="item${p.outOfStock ? " out-of-stock" : ""}">
   <a class="link" href="${escapeHtml(p.href ?? `/p/${slug(p.name)}`)}"><h2 class="name">${escapeHtml(p.name)}</h2></a>
   <span class="price">${fmtPrice(p.price, p.symbol)}</span>
   ${p.listPrice === undefined ? "" : `<span class="list-price">${fmtPrice(p.listPrice, p.symbol)}</span>`}

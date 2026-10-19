@@ -41,7 +41,7 @@ Harness-added CLI option and env vars (not in ARCHITECTURE.md originally; the en
 Selectors-extractor conventions (watch field `selectors`, all CSS): `pageMarker` (must exist, else broken), `item`
 (per offer), `name`, `price`, `listPrice` (optional), `sizes` (one element per size, text = label; a size is
 unavailable when the element has class `unavailable`), `link` (an `a` element, `href`, resolved against the page URL).
-An offer is in stock when it has no `sizes` elements or at least one is available. Offer id derives from the link.
+An offer is out of stock when its `item` element has class `out-of-stock` (works for offers without sizes), or when it has size elements and none is available; otherwise it is in stock. Offer id derives from the link.
 `history.csv` header: `ts,watch,offer_id,name,price,list_price,currency,sizes_available,matched,error`; `ts` ISO 8601;
 `price`/`list_price` plain numbers (`2999` or `2999.00`), `list_price` empty when absent; `matched` is `yes`/`no`;
 `sizes_available` lists the available labels; `error` holds the reason for a broken check.
@@ -72,12 +72,12 @@ Status: all `todo` (run, currently failing against the stub CLI) until the task 
 |---|---|---|---|
 | REQ-001 | `req-001-watch-definitions.test.ts`: two valid files both checked; missing field reported once + others run + non-zero exit; unknown site, same; `enabled: false` skipped | T-004 | todo |
 | REQ-002 | `req-002-daily-run.test.ts`: 3 products give 3 offers with name/price/list price/sizes; 2 URLs combined into one watch result | T-003 | todo |
-| REQ-003 | `req-003-conditions.test.ts`: maxPrice 2999/3001; minDiscountPct 15 vs 14.9; sizes no-match; sizes match lists only matching sizes; nameIncludes/nameExcludes; case-insensitive include; out of stock | T-005 | todo |
+| REQ-003 | `req-003-conditions.test.ts`: maxPrice 2999/3001; minDiscountPct 15 vs 14.9; sizes no-match; sizes match lists only matching sizes; nameIncludes/nameExcludes; case-insensitive include; out of stock (all sizes unavailable, and `out-of-stock` class without sizes) | T-005 | todo |
 | REQ-004 | `req-004-alert-diff.test.ts`: new offer alerts once (T-003); cheaper; price rise and sizes shrink silent; new size; disappear and reappear; stops matching then forgotten; two offers one message; message content (all T-006) | T-003, T-006 | todo |
 | REQ-005 | `req-005-broken-detection.test.ts`: missing structure alerts once + snapshot; repeat silent; recovered; alert state kept; zero products not broken; timeout with other watches running; HTTP 500; unexpected currency | T-007 | todo |
 | REQ-006 | `req-006-history.test.ts`: 3 rows with columns; 180-day prune; broken check row | T-008 | todo |
 | REQ-007 | `req-007-notification.test.ts`: stdin recorded; failing notify retried next run; unset var refuses to start (all T-003); unset var allowed with `--dry-run` (T-009) | T-003, T-009 | todo |
-| REQ-008 | `req-008-untrusted-pages.test.ts`: hostile name stripped and capped at 120; foreign/`javascript:` link replaced by watch URL | T-010 | todo |
+| REQ-008 | `req-008-untrusted-pages.test.ts`: hostile name stripped and capped at 120; foreign/`javascript:` link replaced by watch URL per offer; 3500-char message cap | T-010 | todo |
 | REQ-009 | `req-009-selectors-extractor.test.ts`: offers extracted as configured (alternate markup); `parsePrice` formats | T-003 | todo |
 | REQ-013 | `req-013-dry-run-single-watch.test.ts`: dry run prints, no notify/state/history writes (fresh and existing state); `--watch <id>` fetches only that watch | T-009 | todo |
 | REQ-010, REQ-011, REQ-012 | not in the harness; added by T-011, T-012, T-013 with trimmed real fixtures | T-011 to T-013 | n/a |

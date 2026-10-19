@@ -31,6 +31,8 @@ describe("REQ-003 conditions", () => {
     assert.doesNotMatch(msgs[0] ?? "", /Bike Over/);
   });
 
+  // Implementations must compare the discount without float drift, e.g. price * 100 <= listPrice * (100 - N),
+  // so exactly 15% matches and 14.9% does not.
   test("REQ-003: minDiscountPct 15 matches a 15% discount not 14.9%", todo("T-005"), async () => {
     const msgs = await runWith({ minDiscountPct: 15 }, [
       { name: "Bike Fifteen", price: 850, listPrice: 1000, sizes: ["M"] },
@@ -116,5 +118,15 @@ describe("REQ-003 conditions", () => {
     assert.equal(msgs.length, 1);
     assert.match(msgs[0] ?? "", /Bike Instock/);
     assert.doesNotMatch(msgs[0] ?? "", /Bike Soldout/);
+  });
+
+  test("REQ-003: an offer without size elements marked out-of-stock does not match", todo("T-005"), async () => {
+    const msgs = await runWith({ maxPrice: 3000 }, [
+      { name: "Wheels Instock", price: 300 },
+      { name: "Wheels Soldout", price: 200, outOfStock: true },
+    ]);
+    assert.equal(msgs.length, 1);
+    assert.match(msgs[0] ?? "", /Wheels Instock/);
+    assert.doesNotMatch(msgs[0] ?? "", /Wheels Soldout/);
   });
 });
