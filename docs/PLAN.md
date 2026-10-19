@@ -34,12 +34,15 @@ because their fixtures come from the spikes.
 
 ### [ ] T-003: Thin slice: run one watch end to end  (size M)
 - Goal: `watchdog run` loads watches, fetches with Playwright, extracts with the `selectors` extractor, checks
-  `maxPrice`, alerts newly matching offers once via `WATCHDOG_NOTIFY_CMD`, saves state.
+  `maxPrice`, alerts newly matching offers once via `WATCHDOG_NOTIFY_CMD`, saves state, appends basic history rows
+  (columns per docs/TESTS.md; no pruning, no broken rows yet), because the REQ-002/REQ-009 tests read history.csv.
+  All alerts of one watch in a run go into one message (the REQ-002 two-URL test needs it); T-006 adds
+  cheaper/new-size reasons and the full message format.
 - REQs: REQ-001 (valid files), REQ-002, REQ-004 (new offers only), REQ-007, REQ-009 (basic)
 - Acceptance tests to make pass: the harness tests for REQ-002, REQ-007 and the "new offer alerts once" case of REQ-004.
 - Areas/files: `src/cli.ts`, `src/watches.ts`, `src/browser.ts`, `src/extractors/selectors.ts`, `src/price.ts`,
-  `src/rules.ts`, `src/diff.ts`, `src/notify.ts`, `src/state.ts`, `src/message.ts`.
-- Definition of done: code + unit tests, listed acceptance tests pass, CI green, review clean, CLAUDE.md commands filled.
+  `src/rules.ts`, `src/diff.ts`, `src/notify.ts`, `src/state.ts`, `src/message.ts`, `src/history.ts` (append only).
+- Definition of done: code + unit tests, listed acceptance tests pass, CI green, review clean.
 
 ### [ ] T-004: Watch validation  (size S)
 - Goal: invalid watch files are reported without stopping other watches; `enabled: false` skipped.
@@ -69,7 +72,8 @@ because their fixtures come from the spikes.
 - Areas/files: `src/browser.ts`, `src/extractors/selectors.ts` (pageMarker), `src/state.ts`, `src/cli.ts`.
 - Definition of done: code + unit tests, acceptance tests pass, CI green, review clean.
 
-### [ ] T-008: History CSV + 180-day prune  (size S)
+### [ ] T-008: History CSV: prune, broken rows, escaping  (size S)
+- Goal: complete REQ-006 on top of T-003's append (180-day prune, broken-check rows, CSV escaping).
 - REQs: REQ-006
 - Acceptance tests to make pass: REQ-006 tests.
 - Areas/files: `src/history.ts`, `src/cli.ts`.
@@ -90,7 +94,7 @@ because their fixtures come from the spikes.
 ## M2: Real sites, repair guide, ready to deploy
 
 ### [ ] T-011: Rose extractor + rose watches  (size M)
-- Goal: `site: rose` from the T-001 findings; `watches/rose-gravel.yaml`, `watches/rose-road.yaml`.
+- Goal: `site: rose` from the T-001 findings; `watches/rose-gravel.yaml` (Backroad + Backroad FF, `nameExcludes` Backroad AL), `watches/rose-road.yaml`.
 - REQs: REQ-010
 - Acceptance tests to make pass: new `tests/acceptance/rose.test.ts` using `tests/fixtures/rose/` (this task may add it;
   needs test-review).
