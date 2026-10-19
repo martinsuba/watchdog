@@ -1,0 +1,33 @@
+{
+  "name": "watchdog",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Daily price watcher for bike shops, alerts via a notify command",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node src/cli.ts",
+    "lint": "eslint .",
+    "format:check": "prettier --check src tests .github package.json tsconfig.json eslint.config.js",
+    "format": "prettier --write src tests .github package.json tsconfig.json eslint.config.js",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "node --test \"tests/unit/**/*.test.ts\"",
+    "test:acceptance": "node --test --test-concurrency=2 \"tests/acceptance/*.test.ts\"",
+    "test": "npm run test:unit && npm run test:acceptance"
+  },
+  "dependencies": {
+    "playwright": "^1.64.1",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.19.2",
+    "eslint": "^10.13.0",
+    "prettier": "^3.9.10",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.2"
+  }
+}
