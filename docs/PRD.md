@@ -1,5 +1,5 @@
 # PRD: watchdog
-Status: draft (plan PR, v1) · Last update: 2026-10-18
+Status: approved (plan PR #1) + v2 clarifications · Last update: 2026-10-19
 
 ## Problem & why
 Martin wants to buy specific bikes and wheels when they hit a good price. Checking several shop pages by hand every day
@@ -142,7 +142,7 @@ Priority: must (also the vehicle for engine acceptance tests)
 
 ### REQ-010: Rose Bikes extractor
 Extracts sale offers from rosebikes.com sale listing pages incl. list price and available sizes. Watches:
-`rose-gravel` (Backroad, Backroad FF: <= 3000 EUR, >= 15% off, sizes XS/S (50/53)) and `rose-road` (Shave: <= 4500 EUR,
+`rose-gravel` (Backroad, Backroad FF, excluding Backroad AL: <= 3000 EUR, >= 15% off, sizes XS/S (50/53)) and `rose-road` (Shave: <= 4500 EUR,
 >= 15% off, sizes L/XL (58/59); appears when it enters the sale).
 Acceptance criteria:
 - Given the recorded Rose fixtures (from the spike), When run, Then the expected offers, prices and sizes are extracted.
@@ -182,8 +182,12 @@ Priority: must
 - Telegram bot token lives only in HAL's existing setup; watchdog never reads it, it just calls `tg_send.sh`.
 - Test fixtures are trimmed, minimal copies of shop page structure (no full saved pages, no personal data).
 
+## Resolved (2026-10-19, Martin)
+- Canyon Endurance: e-bikes (Endurance:ON) excluded.
+- Rose Backroad: aluminium "Backroad AL" excluded (only Backroad and Backroad FF).
+- Production code pinned by release tag, watch files follow main (D-005): confirmed.
+- "Recovered" message after a broken watch works again (REQ-005): confirmed.
+
 ## Open questions
 - Exact size labels per site (letters vs frame sizes 50/53/58/59): decided by the spikes (T-001/T-002); watches list both.
-- Canyon Endurance: exclude e-bikes (Endurance:ON) by default. Martin to confirm in the PR.
-- Rose Backroad: aluminium "Backroad AL" (if listed) is included unless Martin says otherwise.
 - AliExpress from a datacenter IP: likely blocked; spike T-002 shows whether it works at all.
