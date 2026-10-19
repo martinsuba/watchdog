@@ -90,7 +90,7 @@ because their fixtures come from the spikes.
 ## M2: Real sites, repair guide, ready to deploy
 
 ### [ ] T-011: Rose extractor + rose watches  (size M)
-- Goal: `site: rose` from the T-001 findings; `watches/rose-gravel.yaml`, `watches/rose-road.yaml`.
+- Goal: `site: rose` from the T-001 findings; `watches/rose-gravel.yaml` (Backroad + Backroad FF, `nameExcludes` Backroad AL), `watches/rose-road.yaml`.
 - REQs: REQ-010
 - Acceptance tests to make pass: new `tests/acceptance/rose.test.ts` using `tests/fixtures/rose/` (this task may add it;
   needs test-review).
