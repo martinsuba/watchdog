@@ -36,6 +36,8 @@ because their fixtures come from the spikes.
 - Goal: `watchdog run` loads watches, fetches with Playwright, extracts with the `selectors` extractor, checks
   `maxPrice`, alerts newly matching offers once via `WATCHDOG_NOTIFY_CMD`, saves state, appends basic history rows
   (columns per docs/TESTS.md; no pruning, no broken rows yet), because the REQ-002/REQ-009 tests read history.csv.
+  All alerts of one watch in a run go into one message (the REQ-002 two-URL test needs it); T-006 adds
+  cheaper/new-size reasons and the full message format.
 - REQs: REQ-001 (valid files), REQ-002, REQ-004 (new offers only), REQ-007, REQ-009 (basic)
 - Acceptance tests to make pass: the harness tests for REQ-002, REQ-007 and the "new offer alerts once" case of REQ-004.
 - Areas/files: `src/cli.ts`, `src/watches.ts`, `src/browser.ts`, `src/extractors/selectors.ts`, `src/price.ts`,
