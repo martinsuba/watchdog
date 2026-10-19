@@ -28,7 +28,9 @@ cron (daily) ─> watchdog run
 - ESLint + Prettier. CI: GitHub Actions (`npx playwright install --with-deps chromium`).
 
 ## Components and responsibilities
-- `src/cli.ts`: argument parsing (`run [--dry-run] [--watch <id>] [--data-dir <dir>]`), exit codes.
+- `src/cli.ts`: argument parsing (`run [--dry-run] [--watch <id>] [--data-dir <dir>] [--watches-dir <dir>]`), exit codes.
+  Test knobs (defaults in brackets): `--watches-dir` [`watches/`], `WATCHDOG_PAGE_TIMEOUT_MS` [45000],
+  `WATCHDOG_PAGE_DELAY_MS` [random 3000–6000]. Acceptance tests use them to stay fast; see docs/TESTS.md.
 - `src/watches.ts`: load `watches/*.yaml`, validate (zod), report invalid files without stopping others.
 - `src/browser.ts`: one Chromium per run, one page per URL, timeouts (45 s), realistic UA, locale en-GB, 3–6 s delay
   between pages, snapshot (HTML + screenshot) on failure. Read-only: only navigation + extractor-specific actions
