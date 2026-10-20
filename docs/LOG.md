@@ -13,3 +13,6 @@ date | gate/phase | what Martin did | could an agent do it? (y/n + why)
 2026-10-19 | harness | Said "it is taking too long" about CI (GitHub Actions incident) | y – Lead should check githubstatus and report proactively when a check is pending > 10 min
 2026-10-19 | harness | Approved `acceptance-change` label on harness PR #3 ("label it") | n – gate by design
 2026-10-19 | harness | Asked Lead to re-verify the CI delay was GitHub-side, cancel the check and save status | y – Lead should verify cause (status page + earlier green runs) before waiting
+2026-10-19 | harness gate | Merged harness PR #3 | n – gate by design
+2026-10-19 | harness | Branch protection on main set via gh api | y – done by agent
+2026-10-20 | build | "go M1" | n – gate by design

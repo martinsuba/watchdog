@@ -1,9 +1,9 @@
 # Status: watchdog
-Phase: harness review   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: –
-Open PRs: #3 Harness (label acceptance-change added; waiting for GitHub Actions, degraded on 2026-10-19)
-Blockers: GitHub Actions incident (githubstatus.com: "Degraded availability for GitHub Actions", since ~15:40 UTC 2026-10-19). Runs on PR #3 stay queued; cancel/force-cancel refused by GitHub (409). Not our config: same workflows ran and passed earlier today (ci success on 1d102e0 and 21c07b4).
-Next step: when Actions recovers, check `gh pr checks 3`; if runs are still stuck, `gh run rerun <id>` on the latest head SHA. Martin merges #3 when ci + acceptance-guard are green → Lead sets branch protection → M1 task list → "go M1".
+Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
+Current task: T-001 (in progress)
+Open PRs: –
+Blockers: –
+Next step: M1 task loop (T-001 … T-010), then milestone PR for Martin
 
 ## Decisions log
 - 2026-10-16: project created
@@ -17,3 +17,5 @@ Next step: when Actions recovers, check `gh pr checks 3`; if runs are still stuc
 - 2026-10-19: Martin stays on one model in the Lead session; Sonnet-role work runs as subagents with model set explicitly.
 - 2026-10-19: Plan v2 merged (PR #2). Harness PR #3: reviewer round 1 → tests tightened (REQ-003/008), 46 acceptance tests todo-marked.
 - 2026-10-19: CI on PR #3 blocked by GitHub Actions incident; waiting (Martin: "we can wait"). Polling stopped; Martin checks back later.
+- 2026-10-19: Harness merged (PR #3); branch protection on main set and verified (ci + acceptance-guard, no force-push/deletion).
+- 2026-10-20: Martin: "go M1".
