@@ -84,4 +84,28 @@ describe("loadWatches", () => {
       assert.match(loadWatches(dir).invalid[0]?.error ?? "", /id: /);
     });
   });
+
+  for (const [field, line] of [
+    ["match.nameIncludes", "match: {nameIncludes: ['  ']}"],
+    ["match.nameExcludes", "match: {nameExcludes: ['']}"],
+    ["match.sizes", "match: {sizes: [' ']}"],
+  ] as const) {
+    test(`blank entries in ${field} are invalid (they would match everything)`, () => {
+      withDir({ "a.yaml": valid.replace("match: {maxPrice: 10}", line) }, (dir) => {
+        const r = loadWatches(dir);
+        assert.equal(r.watches.length, 0);
+        assert.match(r.invalid[0]?.error ?? "", new RegExp(field.replace(".", "\\.")));
+      });
+    });
+  }
+  test("match terms are trimmed", () => {
+    withDir(
+      { "a.yaml": valid.replace("match: {maxPrice: 10}", "match: {nameIncludes: [' gravel '], sizes: [' 56 ']}") },
+      (dir) => {
+        const m = loadWatches(dir).watches[0]?.match;
+        assert.deepEqual(m?.nameIncludes, ["gravel"]);
+        assert.deepEqual(m?.sizes, ["56"]);
+      },
+    );
+  });
 });

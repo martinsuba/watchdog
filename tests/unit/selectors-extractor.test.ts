@@ -43,4 +43,16 @@ describe("buildOffers", () => {
   test("an unparsable price throws", () => {
     assert.throws(() => buildOffers([{ ...base, price: "ask us" }], "EUR", "http://s/list"), /price/i);
   });
+  test("hostile name and size labels are sanitized at the extractor boundary (REQ-008)", () => {
+    const hostile = `Bike <b>Pro</b>\u202E\u0007${"x".repeat(500)}`;
+    const [o] = buildOffers(
+      [{ ...base, name: hostile, sizes: [{ label: "<i>S</i>\u200B", available: true }] }],
+      "EUR",
+      "http://s/list",
+    );
+    // eslint-disable-next-line no-control-regex
+    assert.doesNotMatch(o?.name ?? "", /[<>\u202E\u0007]/);
+    assert.equal(Array.from(o?.name ?? "").length, 120);
+    assert.deepEqual(o?.sizes, [{ label: "S", available: true }]);
+  });
 });

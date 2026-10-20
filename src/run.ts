@@ -116,7 +116,7 @@ export async function run(cfg: RunConfig): Promise<number> {
       results.filter((r) => r.matched),
     );
     record(historyRows(watch, results));
-    if (alerts.length > 0) await send(renderMessage(watch.name, alerts));
+    if (alerts.length > 0) await send(renderMessage(watch.name, alerts, watch.urls));
     state[watch.id] = { broken: null, alerted: nextAlerted };
     save(state, invalidFiles);
   }

@@ -77,7 +77,7 @@ Status: `todo` until the task in the "Un-todo task" column removes the markers; 
 | REQ-005 | `req-005-broken-detection.test.ts`: missing structure alerts once + snapshot; repeat silent; recovered; alert state kept; zero products not broken; timeout with other watches running; HTTP 500; unexpected currency | T-007 | done |
 | REQ-006 | `req-006-history.test.ts`: 3 rows with columns; 180-day prune; broken check row | T-008 | done |
 | REQ-007 | `req-007-notification.test.ts`: stdin recorded; failing notify retried next run; unset var refuses to start (all T-003); unset var allowed with `--dry-run` (T-009) | T-003, T-009 | done |
-| REQ-008 | `req-008-untrusted-pages.test.ts`: hostile name stripped and capped at 120; foreign/`javascript:` link replaced by watch URL per offer; 3500-char message cap | T-010 | todo |
+| REQ-008 | `req-008-untrusted-pages.test.ts`: hostile name stripped and capped at 120; foreign/`javascript:` link replaced by watch URL per offer; 3500-char message cap | T-010 | done |
 | REQ-009 | `req-009-selectors-extractor.test.ts`: offers extracted as configured (alternate markup); `parsePrice` formats | T-003 | done |
 | REQ-013 | `req-013-dry-run-single-watch.test.ts`: dry run prints, no notify/state/history writes (fresh and existing state); `--watch <id>` fetches only that watch | T-009 | done |
 | REQ-010, REQ-011, REQ-012 | not in the harness; added by T-011, T-012, T-013 with trimmed real fixtures | T-011 to T-013 | n/a |
