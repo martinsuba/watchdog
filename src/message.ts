@@ -1,12 +1,22 @@
 import type { Alert } from "./diff.ts";
 import type { InvalidWatch } from "./watches.ts";
 
-/** Plain-text message for one watch. T-006 adds the full format, T-010 sanitizing and capping. */
+/** Discount in whole percent, only when a list price above the price is known. */
+function discountPct(price: number, listPrice?: number): number | null {
+  if (listPrice === undefined || !(listPrice > price)) return null;
+  return Math.round((1 - price / listPrice) * 100);
+}
+
+/** Plain-text message for one watch (REQ-004). T-010 adds sanitizing and capping. */
 export function renderMessage(watchName: string, alerts: Alert[]): string {
   const lines = [`Watchdog: ${watchName}`];
-  for (const { reason, offer, matchingSizes } of alerts) {
-    lines.push("", `[${reason}] ${offer.name}`);
-    lines.push(`${offer.price} ${offer.currency}${matchingSizes.length ? `, sizes: ${matchingSizes.join(", ")}` : ""}`);
+  for (const { reasons, offer, matchingSizes } of alerts) {
+    lines.push("", `[${reasons.join(" + ")}] ${offer.name}`);
+    const pct = discountPct(offer.price, offer.listPrice);
+    const list = pct === null ? "" : ` (list ${offer.listPrice} ${offer.currency}, -${pct}%)`;
+    lines.push(
+      `${offer.price} ${offer.currency}${list}${matchingSizes.length ? `, sizes: ${matchingSizes.join(", ")}` : ""}`,
+    );
     lines.push(offer.url);
   }
   return lines.join("\n") + "\n";
