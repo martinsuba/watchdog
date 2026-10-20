@@ -26,3 +26,15 @@ export function renderMessage(watchName: string, alerts: Alert[]): string {
 export function renderInvalidWatch(invalid: InvalidWatch): string {
   return `Watchdog: invalid watch ${invalid.file}\n\n${invalid.error}\nFix the file in watches/; this watch is skipped until then.\n`;
 }
+
+const oneLine = (s: string, max: number) => s.replace(/\s+/g, " ").trim().slice(0, max);
+
+/** One alert when a watch turns broken (REQ-005). The reason is capped to a single line. */
+export function renderBroken(watchName: string, reason: string): string {
+  return `Watchdog: ${watchName}\n\nwatch is broken: ${oneLine(reason, 200)}\nSnapshot saved under data/broken/; see docs/REPAIR.md.\n`;
+}
+
+/** One message when a broken watch works again (REQ-005). */
+export function renderRecovered(watchName: string): string {
+  return `Watchdog: ${watchName}\n\nwatch recovered: the page loads and parses again.\n`;
+}
