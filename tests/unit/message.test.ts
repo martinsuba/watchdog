@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { renderInvalidWatch, renderMessage } from "../../src/message.ts";
 
 const alert = (name: string) => ({
-  reason: "new" as const,
+  reasons: ["new" as const],
   offer: {
     id: name,
     name,
@@ -25,6 +25,31 @@ describe("renderMessage", () => {
     assert.match(msg, /new/i);
     assert.match(msg, /2800/);
     assert.match(msg, /http:\/\/x\/First/);
+  });
+});
+
+describe("renderMessage details", () => {
+  const base = alert("Detail");
+  test("shows list price and discount percent, rounded", () => {
+    const a = { ...base, offer: { ...base.offer, price: 850, listPrice: 1000 } };
+    const msg = renderMessage("W", [a]);
+    assert.match(msg, /850/);
+    assert.match(msg, /1000/);
+    assert.match(msg, /15 ?%/);
+  });
+  test("no list price or a list price not above the price: no discount shown", () => {
+    assert.doesNotMatch(renderMessage("W", [base]), /%/);
+    const a = { ...base, offer: { ...base.offer, listPrice: 2800 } };
+    assert.doesNotMatch(renderMessage("W", [a]), /%/);
+  });
+  test("shows every reason", () => {
+    const msg = renderMessage("W", [{ ...base, reasons: ["cheaper" as const, "new size" as const] }]);
+    assert.match(msg, /cheaper/);
+    assert.match(msg, /new size/);
+  });
+  test("lists matching sizes", () => {
+    const msg = renderMessage("W", [{ ...base, matchingSizes: ["S", "M"] }]);
+    assert.match(msg, /sizes: S, M/);
   });
 });
 
