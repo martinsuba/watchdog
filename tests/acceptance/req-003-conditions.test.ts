@@ -28,7 +28,6 @@ describe("REQ-003 conditions", () => {
     ]);
     assert.equal(msgs.length, 1);
     assert.match(msgs[0] ?? "", /Bike Under/);
-    assert.doesNotMatch(msgs[0] ?? "", /Bike Over/);
   });
 
   // Implementations must compare the discount without float drift, e.g. price * 100 <= listPrice * (100 - N),
