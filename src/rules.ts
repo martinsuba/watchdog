@@ -11,11 +11,11 @@ export type MatchResult = {
 const lower = (s: string) => s.toLowerCase();
 
 /** Pure. All configured conditions of REQ-003 must hold; availability and currency are always required. */
-export function matches(offer: Offer, match: Match, watchCurrency?: string): MatchResult {
+export function matches(offer: Offer, match: Match, watchCurrency: string): MatchResult {
   const available = offer.sizes.filter((s) => s.available).map((s) => s.label);
   const wanted = (match.sizes ?? []).map(lower);
   const matchingSizes = wanted.length > 0 ? available.filter((l) => wanted.includes(lower(l))) : available;
-  const currencyMismatch = watchCurrency !== undefined && lower(offer.currency) !== lower(watchCurrency);
+  const currencyMismatch = lower(offer.currency) !== lower(watchCurrency);
 
   const name = lower(offer.name);
   const inStock = offer.inStock && (offer.sizes.length === 0 || available.length > 0);

@@ -1,6 +1,7 @@
 import type { Page } from "playwright";
 import { ExtractError } from "../errors.ts";
 import { parsePrice } from "../price.ts";
+import { MAX_NAME, sanitizeText } from "../sanitize.ts";
 import type { Offer, Selectors, Size, Watch } from "../types.ts";
 
 /** Typed strings read from the page; the page is untrusted, so nothing else is taken from it. */
@@ -13,6 +14,7 @@ export type RawOffer = {
   outOfStock: boolean;
 };
 
+const MAX_SIZE_LABEL = 40;
 const clean = (s: string) => s.replace(/\s+/g, " ").trim();
 const slug = (s: string) =>
   s
@@ -23,7 +25,7 @@ const slug = (s: string) =>
 /** Pure: raw strings -> offers. Offer id derives from the link (without fragment). */
 export function buildOffers(raws: RawOffer[], watchCurrency: string, pageUrl: string): Offer[] {
   return raws.map((raw) => {
-    const name = clean(raw.name);
+    const name = sanitizeText(raw.name, MAX_NAME);
     const price = parsePrice(raw.price);
     const list = raw.listPrice === null || clean(raw.listPrice) === "" ? undefined : parsePrice(raw.listPrice);
     let url = pageUrl;
@@ -34,7 +36,7 @@ export function buildOffers(raws: RawOffer[], watchCurrency: string, pageUrl: st
       url = u.href;
       id = u.href;
     }
-    const sizes = raw.sizes.map((s) => ({ label: clean(s.label), available: s.available }));
+    const sizes = raw.sizes.map((s) => ({ label: sanitizeText(s.label, MAX_SIZE_LABEL), available: s.available }));
     const inStock = !raw.outOfStock && (sizes.length === 0 || sizes.some((s) => s.available));
     return {
       id,

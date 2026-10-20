@@ -17,12 +17,15 @@ const selectorsSchema = z.object({
   link: z.string().min(1).optional(),
 });
 
+/** Trimmed, non-empty: a blank term would match every offer. */
+const term = z.string().trim().min(1);
+
 const matchSchema = z.object({
-  nameIncludes: z.array(z.string()).optional(),
-  nameExcludes: z.array(z.string()).optional(),
+  nameIncludes: z.array(term).optional(),
+  nameExcludes: z.array(term).optional(),
   maxPrice: z.number().positive().optional(),
   minDiscountPct: z.number().min(0).max(100).optional(),
-  sizes: z.array(z.coerce.string()).optional(),
+  sizes: z.array(z.coerce.string().pipe(term)).optional(),
 });
 
 const watchSchema = z

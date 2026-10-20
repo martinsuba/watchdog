@@ -1,7 +1,10 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { matches } from "../../src/rules.ts";
-import type { Offer } from "../../src/types.ts";
+import { matches as matchesWith } from "../../src/rules.ts";
+import type { Match, Offer } from "../../src/types.ts";
+
+/** The watch currency is a required parameter; most tests use the default EUR. */
+const matches = (o: Offer, m: Match, currency = "EUR") => matchesWith(o, m, currency);
 
 const offer = (price: number, extra: Partial<Offer> = {}): Offer => ({
   id: "o1",
@@ -90,10 +93,9 @@ describe("matches", () => {
       assert.equal(r.matched, false);
       assert.equal(r.currencyMismatch, true);
     });
-    test("same currency is fine; currency check is skipped when not given", () => {
+    test("same currency is fine", () => {
       assert.equal(matches(offer(1), {}, "EUR").matched, true);
       assert.equal(matches(offer(1), {}, "EUR").currencyMismatch, false);
-      assert.equal(matches(offer(1, { currency: "USD" }), {}).matched, true);
     });
   });
 });
