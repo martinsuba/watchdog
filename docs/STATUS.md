@@ -1,15 +1,14 @@
 # Status: watchdog
 Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: T-007 (in progress)
+Current task: T-008 (in progress)
 Open PRs: –
 Blockers: –
 Next step: M1 task loop (T-001 … T-010), then milestone PR for Martin
 
-Done in M1 (PLAN.md ticks go into the milestone PR; task PRs must not touch PLAN.md): T-001, T-002, T-003, T-004, T-005, T-006
+Done in M1 (PLAN.md ticks go into the milestone PR; task PRs must not touch PLAN.md): T-001, T-002, T-003, T-004, T-005, T-006, T-007
 
 ## Follow-ups from reviews (fold into the named task)
-- Corrupt data/state.json crashes the run with a stack trace (loadState outside try) → T-007 (broken/robustness).
-- page.goto ignores HTTP status → T-007 (REQ-005 HTTP 500 test).
+- `state.json.corrupt-*` backups never pruned; snapshot `within()` timer not cleared (exit delay up to 5 s) → T-008.
 - run.ts writes state (invalidFiles) and may notify invalid-watch alerts before any dry-run guard → T-009 must skip both on --dry-run.
 - Invalid-watch message has no overall length cap beyond the 400-char error → T-010.
 - Watch schema accepts blank terms (`nameIncludes: [""]` matches everything); trim + min(1) for names/sizes; make `watchCurrency` required in rules.matches → T-010 (input hygiene).
@@ -42,3 +41,4 @@ Done in M1 (PLAN.md ticks go into the milestone PR; task PRs must not touch PLAN
 - 2026-10-20: T-004 merged (PR #8, 1 fix round): invalid watch files alert once per file content (hash in state.json `invalidFiles`), not every run.
 - 2026-10-20: T-005 merged (PR #9): all REQ-003 conditions; currency mismatch never matches (flag for T-007).
 - 2026-10-20: T-006 merged (PR #10): cheaper vs last alerted price, new size, forget on stop-matching, one message per watch with reasons.
+- 2026-10-20: T-007 merged (PR #11): broken/recovered alerts, HTTP status check, snapshots (every failing run, newest 5 kept), corrupt state.json renamed + empty state (alerts may repeat once). Exit 0 for an alerted broken watch; non-zero only for invalid files, notify failures, crashes.
