@@ -12,7 +12,7 @@ const isObject = (v: unknown): v is Record<string, unknown> => v !== null && typ
  * A missing file is empty state. A corrupt file (bad JSON or not an object) is moved to state.json.corrupt-<ts>, an
  * error is logged, and the run continues with empty state (alerts may repeat once) instead of crashing.
  */
-function readRaw(file: string): Record<string, unknown> {
+function readRaw(file: string, readOnly = false): Record<string, unknown> {
   if (!existsSync(file)) return {};
   let parsed: unknown;
   let reason = "";
@@ -23,6 +23,13 @@ function readRaw(file: string): Record<string, unknown> {
     reason = e instanceof Error ? e.message : String(e);
   }
   if (reason === "") return parsed as Record<string, unknown>;
+  if (readOnly) {
+    // dry run: no side effects, so the file stays where it is
+    console.error(
+      `state file ${file} is corrupt (${reason}); dry run leaves it untouched, continuing with empty state`,
+    );
+    return {};
+  }
   const kept = `${file}.corrupt-${new Date().toISOString().replace(/:/g, "-")}`;
   try {
     renameSync(file, kept);
@@ -33,8 +40,9 @@ function readRaw(file: string): Record<string, unknown> {
   return {};
 }
 
-export function loadState(file: string): State {
-  const raw = readRaw(file);
+/** `readOnly` (dry run): a corrupt file is reported but not renamed. */
+export function loadState(file: string, readOnly = false): State {
+  const raw = readRaw(file, readOnly);
   const state: State = {};
   for (const [id, v] of Object.entries(raw)) {
     if (id === INVALID_KEY || !isObject(v)) continue;
@@ -49,8 +57,8 @@ export function loadState(file: string): State {
 }
 
 /** file name -> sha256 of the invalid content that was already alerted. Old state files without the key give {}. */
-export function loadInvalidFiles(file: string): InvalidFiles {
-  const v = readRaw(file)[INVALID_KEY];
+export function loadInvalidFiles(file: string, readOnly = false): InvalidFiles {
+  const v = readRaw(file, readOnly)[INVALID_KEY];
   return v !== null && typeof v === "object" ? (v as InvalidFiles) : {};
 }
 

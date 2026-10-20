@@ -26,12 +26,9 @@ async function main(argv: string[]): Promise<number> {
     console.error(`${e instanceof Error ? e.message : String(e)}\n${USAGE}`);
     return 1;
   }
-  if (values["dry-run"] || values.watch !== undefined) {
-    console.error("watchdog run: --dry-run and --watch are not implemented yet (T-009)");
-    return 2;
-  }
+  const dryRun = values["dry-run"];
   const notifyCmd = process.env.WATCHDOG_NOTIFY_CMD;
-  if (!notifyCmd) {
+  if (!dryRun && !notifyCmd) {
     console.error("watchdog run: WATCHDOG_NOTIFY_CMD is not set (command that receives the message on stdin)");
     return 2;
   }
@@ -39,6 +36,8 @@ async function main(argv: string[]): Promise<number> {
     watchesDir: values["watches-dir"],
     dataDir: values["data-dir"],
     notifyCmd,
+    dryRun,
+    watchId: values.watch,
     browser: browserOptionsFromEnv(process.env),
   });
 }
