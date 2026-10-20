@@ -30,7 +30,7 @@ describe("renderMessage", () => {
 
 describe("renderInvalidWatch", () => {
   test("contains 'invalid watch', the file and the problem", () => {
-    const m = renderInvalidWatch({ file: "x.yaml", error: "x.yaml: urls: too small" });
+    const m = renderInvalidWatch({ file: "x.yaml", error: "x.yaml: urls: too small", hash: "h" });
     assert.match(m, /invalid watch/i);
     assert.match(m, /x\.yaml/);
     assert.match(m, /urls: too small/);

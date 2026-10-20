@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse } from "yaml";
@@ -43,13 +44,14 @@ const watchSchema = z
   });
 
 /** `error` is a single capped line: "<file>: <field path>: <problem>[; ...]". File content is untrusted. */
-export type InvalidWatch = { file: string; error: string };
+export type InvalidWatch = { file: string; error: string; hash: string };
 
 const MAX_ERROR_LENGTH = 400;
 
-function invalidWatch(file: string, problem: string): InvalidWatch {
+function invalidWatch(file: string, problem: string, content: string): InvalidWatch {
   const line = `${file}: ${problem}`.replace(/\s+/g, " ").trim();
-  return { file, error: line.length > MAX_ERROR_LENGTH ? `${line.slice(0, MAX_ERROR_LENGTH - 1)}…` : line };
+  const hash = createHash("sha256").update(content).digest("hex");
+  return { file, hash, error: line.length > MAX_ERROR_LENGTH ? `${line.slice(0, MAX_ERROR_LENGTH - 1)}…` : line };
 }
 
 /** Loads watches/*.yaml; invalid files are returned, not thrown, so the others still run (REQ-001). */
@@ -60,22 +62,27 @@ export function loadWatches(dir: string): { watches: Watch[]; invalid: InvalidWa
     .filter((f) => f.endsWith(".yaml"))
     .sort();
   for (const file of files) {
+    let content = "";
     try {
-      const parsed = watchSchema.safeParse(parse(readFileSync(join(dir, file), "utf8")));
+      content = readFileSync(join(dir, file), "utf8");
+      const parsed = watchSchema.safeParse(parse(content));
       if (!parsed.success) {
         invalid.push(
           invalidWatch(
             file,
             parsed.error.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`).join("; "),
+            content,
           ),
         );
       } else if (parsed.data.id !== file.slice(0, -".yaml".length)) {
-        invalid.push(invalidWatch(file, `id: "${parsed.data.id}" must equal the file name`));
+        invalid.push(invalidWatch(file, `id: "${parsed.data.id}" must equal the file name`, content));
       } else {
         watches.push(parsed.data as Watch);
       }
     } catch (e) {
-      invalid.push(invalidWatch(file, e instanceof Error ? (e.message.split("\n")[0] ?? "unreadable") : "unreadable"));
+      invalid.push(
+        invalidWatch(file, e instanceof Error ? (e.message.split("\n")[0] ?? "unreadable") : "unreadable", content),
+      );
     }
   }
   return { watches, invalid };

@@ -5,10 +5,11 @@ import { diff } from "./diff.ts";
 import { extract } from "./extractors/selectors.ts";
 import { appendHistory } from "./history.ts";
 import type { HistoryRow } from "./history.ts";
-import { renderInvalidWatch, renderMessage } from "./message.ts";
+import { alertInvalid } from "./invalid.ts";
+import { renderMessage } from "./message.ts";
 import { notify } from "./notify.ts";
 import { matches } from "./rules.ts";
-import { loadState, saveState } from "./state.ts";
+import { loadInvalidFiles, loadState, saveState } from "./state.ts";
 import type { Offer, Watch } from "./types.ts";
 import { loadWatches } from "./watches.ts";
 
@@ -23,20 +24,13 @@ export type RunConfig = {
 export async function run(cfg: RunConfig): Promise<number> {
   const { watches, invalid } = loadWatches(cfg.watchesDir);
   let failed = invalid.length > 0;
-  for (const i of invalid) {
-    console.error(`invalid watch ${i.error}`);
-    // Not de-duplicated across runs: state.json is keyed by watch id and an invalid file has no reliable id. The
-    // non-zero exit and a daily alert keep nagging until the file is fixed.
-    try {
-      await notify(cfg.notifyCmd, renderInvalidWatch(i));
-    } catch (e) {
-      console.error(`notify failed for invalid watch ${i.file}: ${e instanceof Error ? e.message : String(e)}`);
-    }
-  }
+  for (const i of invalid) console.error(`invalid watch ${i.error}`);
 
   const statePath = join(cfg.dataDir, "state.json");
   const historyPath = join(cfg.dataDir, "history.csv");
   const state = loadState(statePath);
+  const invalidFiles = await alertInvalid(invalid, loadInvalidFiles(statePath), (m) => notify(cfg.notifyCmd, m));
+  saveState(statePath, state, invalidFiles);
   const session = new BrowserSession(cfg.browser);
   try {
     for (const watch of watches.filter((w) => w.enabled)) {
@@ -49,7 +43,7 @@ export async function run(cfg: RunConfig): Promise<number> {
         appendHistory(historyPath, historyRows(watch, results));
         if (alerts.length > 0) await notify(cfg.notifyCmd, renderMessage(watch.name, alerts));
         state[watch.id] = { broken: state[watch.id]?.broken ?? null, alerted: nextAlerted };
-        saveState(statePath, state);
+        saveState(statePath, state, invalidFiles);
       } catch (e) {
         failed = true;
         console.error(`watch ${watch.id} failed: ${e instanceof Error ? e.message : String(e)}`);
