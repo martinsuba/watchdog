@@ -158,6 +158,7 @@ Server-rendered Salesforce Commerce Cloud pages; no JSON blob needed.
   need zero product pages) -> product page for candidates (each colour of a candidate if size matters per colour).
   Unexplored: the `data-url` on size buttons (`.../Product-Variation?...&dwvar_<id>_pv_rahmengroesse=<size>`) probably returns
   JSON/HTML per variant and could save page loads.
+
 ### aliexpress.com item page (spike T-002, captured 2026-10-20)
 Probe: `scripts/spike/aliexpress.ts` (one load per run), trimmer `scripts/spike/aliexpress-trim.ts`. Fixtures:
 `tests/fixtures/aliexpress/`. Item 1005006902683405 (EliteWheels ENT 2.0), URL without tracking params. 3 page loads in
@@ -204,7 +205,6 @@ interaction, no proxy, no stealth plugin.
   blocked" path with the structural check above, and accept it may break without notice. Not worth variant clicking in v1.
 
 ### Other services
-- aliexpress.com item page (spike T-002, captured 2026-10-20): see the section below.
 - Telegram: via `~/HAL/scripts/tg_send.sh`, usage `echo "text" | tg_send.sh`, plain text (no parse mode). Token managed
   by HAL, never read by watchdog.
 

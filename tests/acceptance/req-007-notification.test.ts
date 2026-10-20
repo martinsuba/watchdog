@@ -20,7 +20,7 @@ describe("REQ-007 notification via command", () => {
   });
   afterEach(() => env.cleanup());
 
-  test("REQ-007: a due alert is piped to the notify command on stdin", todo("T-003"), async () => {
+  test("REQ-007: a due alert is piped to the notify command on stdin", async () => {
     const res = await runCli(env);
     assert.equal(res.code, 0, res.stderr);
     const msgs = messages(env);
@@ -29,35 +29,27 @@ describe("REQ-007 notification via command", () => {
     assert.match(msgs[0] ?? "", /Bike Notify/);
   });
 
-  test(
-    "REQ-007: when the notify command exits 1 the run exits non-zero and the next run sends the same alert again",
-    todo("T-003"),
-    async () => {
-      const failing = await runCli(env, { env: { WATCHDOG_TEST_NOTIFY_FAIL: "1" } });
-      assert.notEqual(failing.code, 0);
-      assert.equal(messages(env).length, 0);
-      const retry = await runCli(env);
-      assert.equal(retry.code, 0, retry.stderr);
-      const msgs = messages(env);
-      assert.equal(msgs.length, 1, "alert retried");
-      assert.match(msgs[0] ?? "", /Bike Notify/);
-      await runCli(env);
-      assert.equal(messages(env).length, 1, "and not repeated once delivered");
-    },
-  );
+  test("REQ-007: when the notify command exits 1 the run exits non-zero and the next run sends the same alert again", async () => {
+    const failing = await runCli(env, { env: { WATCHDOG_TEST_NOTIFY_FAIL: "1" } });
+    assert.notEqual(failing.code, 0);
+    assert.equal(messages(env).length, 0);
+    const retry = await runCli(env);
+    assert.equal(retry.code, 0, retry.stderr);
+    const msgs = messages(env);
+    assert.equal(msgs.length, 1, "alert retried");
+    assert.match(msgs[0] ?? "", /Bike Notify/);
+    await runCli(env);
+    assert.equal(messages(env).length, 1, "and not repeated once delivered");
+  });
 
-  test(
-    "REQ-007: with WATCHDOG_NOTIFY_CMD unset, run exits non-zero with a clear error and fetches nothing",
-    todo("T-003"),
-    async () => {
-      const res = await runCli(env, { noNotify: true });
-      assert.notEqual(res.code, 0);
-      assert.match(res.stderr, /WATCHDOG_NOTIFY_CMD/);
-      assert.deepEqual(env.server.requests, []);
-      assert.ok(!existsSync(join(env.dataDir, "state.json")));
-      assert.equal(readText(env.notifyFile), null);
-    },
-  );
+  test("REQ-007: with WATCHDOG_NOTIFY_CMD unset, run exits non-zero with a clear error and fetches nothing", async () => {
+    const res = await runCli(env, { noNotify: true });
+    assert.notEqual(res.code, 0);
+    assert.match(res.stderr, /WATCHDOG_NOTIFY_CMD/);
+    assert.deepEqual(env.server.requests, []);
+    assert.ok(!existsSync(join(env.dataDir, "state.json")));
+    assert.equal(readText(env.notifyFile), null);
+  });
 
   test("REQ-007: with WATCHDOG_NOTIFY_CMD unset, --dry-run still works", todo("T-009"), async () => {
     const res = await runCli(env, { noNotify: true, args: ["--dry-run"] });

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { parsePrice } from "../../src/price.ts";
-import { makeEnv, readHistory, runCli, todo, writeWatch } from "./support/harness.ts";
+import { makeEnv, readHistory, runCli, writeWatch } from "./support/harness.ts";
 import type { Env } from "./support/harness.ts";
 
 describe("REQ-009 generic selectors extractor", () => {
@@ -11,7 +11,7 @@ describe("REQ-009 generic selectors extractor", () => {
   });
   afterEach(() => env.cleanup());
 
-  test("REQ-009: offers are extracted as configured by the watch's selectors", todo("T-003"), async () => {
+  test("REQ-009: offers are extracted as configured by the watch's selectors", async () => {
     writeWatch(env, {
       id: "alt",
       urls: [env.server.url("/alt-markup.html")],
@@ -39,7 +39,7 @@ describe("REQ-009 generic selectors extractor", () => {
     assert.equal(two?.list_price, "");
   });
 
-  test("REQ-009: price strings in common formats are parsed to the right numeric value", todo("T-003"), () => {
+  test("REQ-009: price strings in common formats are parsed to the right numeric value", () => {
     const cases: [string, number][] = [
       ["2 999,00 €", 2999],
       ["2 999,00 €", 2999],
