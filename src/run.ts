@@ -4,13 +4,13 @@ import type { BrowserOptions } from "./browser.ts";
 import { diff } from "./diff.ts";
 import { ExtractError } from "./errors.ts";
 import { extract } from "./extractors/selectors.ts";
-import { appendHistory } from "./history.ts";
+import { appendHistory, pruneHistory } from "./history.ts";
 import type { HistoryRow } from "./history.ts";
 import { alertInvalid } from "./invalid.ts";
 import { renderBroken, renderMessage, renderRecovered } from "./message.ts";
 import { notify } from "./notify.ts";
 import { matches } from "./rules.ts";
-import { loadInvalidFiles, loadState, saveState } from "./state.ts";
+import { loadInvalidFiles, loadState, pruneCorruptBackups, saveState } from "./state.ts";
 import type { Offer, Watch } from "./types.ts";
 import { loadWatches } from "./watches.ts";
 
@@ -29,7 +29,9 @@ export async function run(cfg: RunConfig): Promise<number> {
 
   const statePath = join(cfg.dataDir, "state.json");
   const historyPath = join(cfg.dataDir, "history.csv");
+  pruneHistory(historyPath);
   const state = loadState(statePath);
+  pruneCorruptBackups(statePath);
   const invalidFiles = await alertInvalid(invalid, loadInvalidFiles(statePath), (m) => notify(cfg.notifyCmd, m));
   saveState(statePath, state, invalidFiles);
   const session = new BrowserSession(cfg.browser);
@@ -47,6 +49,7 @@ export async function run(cfg: RunConfig): Promise<number> {
     } catch (e) {
       if (!(e instanceof ExtractError)) throw e;
       console.error(`watch ${watch.id} is broken: ${e.reason}`);
+      appendHistory(historyPath, [{ ts: new Date().toISOString(), watch: watch.id, error: e.reason }]);
       if (prev.broken !== null) return; // already alerted, stay silent until it recovers
       await send(renderBroken(watch.name, e.reason));
       state[watch.id] = { broken: { reason: e.reason, since: new Date().toISOString() }, alerted: prev.alerted };
