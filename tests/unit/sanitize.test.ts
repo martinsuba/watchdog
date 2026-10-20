@@ -115,3 +115,33 @@ describe("capMessage", () => {
     assert.ok(wellFormed(out));
   });
 });
+
+describe("sanitizeText runs in linear time on hostile input", () => {
+  const mixed = "<a href=x>t</a><script>q</script>&lt;<b ".repeat(30000).slice(0, 1_000_000);
+  const cases: [string, string, (out: string) => void][] = [
+    ["200000 open brackets", "<".repeat(200000), (o) => assert.equal(o, "")],
+    [
+      "unclosed script tags",
+      "<script ".repeat(30000),
+      (o) => assert.ok(o.startsWith("script script") && o.length <= 120),
+    ],
+    ["200000 chars of <a", "<a".repeat(100000), (o) => assert.match(o, /^a+…$/)],
+    ["entities", "&lt;".repeat(100000), (o) => assert.ok(o.startsWith("&lt;&lt;") && o.length <= 120)],
+    ["1 MB mixed", mixed, (o) => assert.ok(o.length > 0 && o.length <= 120 && !/[<>]/.test(o))],
+    ["many closed tags", "<b>x</b>".repeat(100000), (o) => assert.ok(o.startsWith("x x") && o.length <= 120)],
+    ["many closed scripts", "<script>a</script>b".repeat(50000), (o) => assert.ok(o.startsWith("b b"))],
+  ];
+  for (const [name, input, check] of cases) {
+    test(`${name} finishes quickly and gives sane output`, () => {
+      const t0 = performance.now();
+      const out = sanitizeText(input);
+      const ms = performance.now() - t0;
+      assert.ok(ms < 500, `took ${ms.toFixed(0)} ms`);
+      check(out);
+    });
+  }
+  test("input is bounded before scanning, without splitting a surrogate pair", () => {
+    const out = sanitizeText("a".repeat(19999) + "\u{1F600}" + "b".repeat(5000), 100000);
+    assert.equal(out, "a".repeat(19999));
+  });
+});

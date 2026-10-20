@@ -10,8 +10,49 @@ const MAX_URL = 500;
 // eslint-disable-next-line no-control-regex
 const INVISIBLE = /[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff]/g;
 const LONE_SURROGATE = /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/g;
-const ACTIVE_ELEMENT = /<(script|style)\b[^>]*>[\s\S]*?(<\/\1\s*>|$)/gi;
-const TAG = /<[^>]*>/g;
+// Untrusted input is bounded before any scan, so work stays linear in a small constant.
+const MAX_INPUT = 20000;
+
+/**
+ * Single-pass markup stripper, linear in the input (no regex rescans). A tag becomes a space; script/style elements
+ * are dropped with their content; an unclosed script/style drops the rest; a "<" without any later ">" is just removed.
+ */
+function stripMarkup(s: string): string {
+  const lower = s.toLowerCase();
+  let out = "";
+  let i = 0;
+  let noMoreClose = false; // once indexOf(">") fails there is no ">" further on, never search again
+  while (i < s.length) {
+    const lt = s.indexOf("<", i);
+    if (lt === -1) {
+      out += s.slice(i);
+      break;
+    }
+    out += s.slice(i, lt);
+    const gt = noMoreClose ? -1 : s.indexOf(">", lt + 1);
+    if (gt === -1) {
+      noMoreClose = true;
+      i = lt + 1; // stray "<": dropped
+      continue;
+    }
+    const m = /^(script|style)(?![a-z0-9])/.exec(lower.slice(lt + 1, lt + 8));
+    if (m === null) {
+      out += " ";
+      i = gt + 1;
+      continue;
+    }
+    const end = lower.indexOf(`</${m[1]}`, gt + 1);
+    if (end === -1) {
+      out += " ";
+      break; // unclosed script/style: the rest is code
+    }
+    const endGt = s.indexOf(">", end);
+    out += " ";
+    if (endGt === -1) break;
+    i = endGt + 1;
+  }
+  return out;
+}
 
 /** Cuts to at most `max` code points (never inside a surrogate pair); an ellipsis marks the cut. */
 function capChars(s: string, max: number): string {
@@ -21,12 +62,15 @@ function capChars(s: string, max: number): string {
 
 /** Plain single-line text: no control/bidi/zero-width characters, no markup, collapsed whitespace, capped. */
 export function sanitizeText(input: string, max: number = MAX_NAME): string {
-  const s = input
-    .replace(LONE_SURROGATE, "\ufffd")
-    .replace(/[\t\n\v\f\r]/g, " ") // line breaks and tabs separate words
-    .replace(INVISIBLE, "") // before \s: JS counts U+FEFF as whitespace
-    .replace(ACTIVE_ELEMENT, " ") // script/style content is code, not text
-    .replace(TAG, " ")
+  let bounded = input.length > MAX_INPUT ? input.slice(0, MAX_INPUT) : input;
+  const last = bounded.charCodeAt(bounded.length - 1);
+  if (last >= 0xd800 && last <= 0xdbff) bounded = bounded.slice(0, -1); // do not cut a surrogate pair
+  const s = stripMarkup(
+    bounded
+      .replace(LONE_SURROGATE, "\ufffd")
+      .replace(/[\t\n\v\f\r]/g, " ") // line breaks and tabs separate words
+      .replace(INVISIBLE, ""), // before \s: JS counts U+FEFF as whitespace
+  )
     .replace(/[<>]/g, "")
     .replace(/\s+/g, " ")
     .trim();
