@@ -73,8 +73,92 @@ All of `data/` is gitignored.
 ## External services / APIs
 (Filled in by spikes T-001/T-002: real page structure, selectors/JSON sources, size labels, cookie banner, block pages,
 fixtures under `tests/fixtures/<site>/`.)
-- rosebikes.com sale listing: TBD (T-001)
-- canyon.com en-sk category pages: TBD (T-001)
+
+### rosebikes.com sale listing (spike T-001, captured 2026-10-20)
+Probe: `scripts/spike/probe.ts`, `scripts/spike/rose-sizes.ts`. Fixtures: `tests/fixtures/rose/` (see README there).
+About 10 page loads in total, all HTTP 200, no captcha/block page, no cookie banner or consent dialog seen (en-GB,
+datacenter IP), no login needed. Page is server-rendered HTML (tiles are custom elements `<catalog-product-tile>`); I
+scrolled during capture, so "tiles present without scrolling" is likely but not tested separately.
+- **Listing** `https://www.rosebikes.com/sale/bikes?sf=1`: 63 results, 48 tiles per page, plain pagination links
+  (`a[data-test="pagination-next-link"]`, `href="/sale/bikes?sf=1&page=2"`; page 2 has the remaining 15). An extractor
+  must follow pages until there is no next link (for Backroad/Shave no URL search parameter was verified).
+- **Page marker** (structure OK, even when empty): `[data-test="catalog-result"]` with `<strong>N</strong> search results`.
+  Real empty listing (`?sf=1&size[]=ZZZ`): marker present with `0`, no tiles, no pagination. Broken if the marker is missing,
+  or N > 0 but no tiles, or tiles on a page != min(48, remaining N).
+- **Per tile** (DOM, no JSON blob needed): tile `catalog-product-tile[data-test-abstract-sku]`; name
+  `[data-test="catalog-product-tile__title"]` text (the `.product-tile-title__brand` span "Rose" is inside it; trim, names
+  have trailing blanks, e.g. "Backroad FF GRX RX825 Di2 "); link `a.catalog-product-tile__link[href]` (relative, e.g.
+  `/p/rose-backroad-ff-grx-rx825-di2-2709984`, sometimes with `?size=..&product_shape=..`); stable product id = abstract SKU
+  (attribute above, = trailing number of the URL slug). `onclick` carries a dataLayer JSON (variant id, category, colour),
+  not needed.
+- **Prices**: sale price `.product-tile-price__current-value` (text `€4,000.00`, also in `content` attr, en format: `,`
+  thousands, `.` decimals, `€` prefix); list price `.product-tile-price__old-value` (preceded by "instead of"); all 48 tiles on
+  page 1 had both. Ignore `.product-tile-price__gp30-*` ("Best price in 30 days*: €4,450.00 (-10%)"): that is the EU
+  legal 30-day reference price, not the list price. Discount for REQ-002 = (old - current) / old (example: 4500 -> 4000 = 11.1%,
+  while the gp30 line says -10%). Currency is always EUR on this domain; check for `€`.
+- **Sizes/availability are NOT in the listing** (tiles show only "N colours"). Product page needed, one per candidate
+  (filter by name/price/discount from the listing first). Optional prefilter, unreliable: listing accepts `size[]=XS&size[]=S`
+  (30 results vs 63) but whether it reflects stock was not verified, and only 12 tiles were rendered in my capture without
+  scrolling.
+- **Product page** (`/p/<slug>-<abstract sku>`, Vue-rendered, ready ~5 s after load): size labels (radio
+  `[data-test="bike-step-value-size-*"] input[name="bike-select-size"]`, `value` = label): `XS S M M/L L XL` for the Backroad FF
+  (road bikes are likely cm labels: the sale size filter lists `57cm 59cm 61cm 62cm 64cm` and `17" 19" 21" 23" 25"`; Shave
+  not in sale yet, so its labels are unverified; normalise "59cm" -> "59" when matching). Prices on the page:
+  `[data-test="price-cross"][data-test-price-value]` (list, in cents: 450000) and `[data-test="price-value-sale"]` (400000);
+  JSON-LD `Offer` has price/currency only. **Availability is per (size, colour)** and appears only after a size is chosen:
+  click a size radio (UI state only, no cart), wait ~2 s, then each colour
+  `[data-test^="bike-step-value-color-"] [data-test="product-availability"]` has
+  `data-test-traffic-light-color` = `green` (in stock, delivery in days, `data-test-delivery-time-value="6/day"`), `yellow`
+  (orderable, delivery in weeks, "Available in 6 weeks", `N/week`) or `red` (sold out, the colour element is a
+  `div[disabled]`, text "Sold out"). Before a size is chosen all colours show a hidden green: do not read it.
+  Observed for Backroad FF GRX RX825 Di2: XS only yellow/red, S green x3, M-L green x2 + yellow, XL green x5.
+  Recommendation: a size counts as available if any colour is green; yellow only as a note (decision for T-005/Martin).
+  Cost: one page load + one click per wanted size (2 s each); sizes labelled XS/S need 2 clicks.
+- **Recommended approach**: DOM only (no JSON). Listing pages -> filter by name (include "Backroad", exclude "Backroad AL";
+  "Backroad FF" is included by the same word) and price/discount -> product page per remaining candidate, click wanted sizes,
+  read traffic lights. `sale-listing.html` / `sale-listing-empty.html` / `product-size-xs|s.html` are the fixtures.
+- Shave: not in the sale listing today (neither page; no "Shave" in the HTML), so the watch is a correctly structured empty result.
+
+### canyon.com en-sk category pages (spike T-001, captured 2026-10-20)
+Probe: `scripts/spike/probe.ts`. Fixtures: `tests/fixtures/canyon/`. 7 page loads, all HTTP 200, no captcha/block page.
+Server-rendered Salesforce Commerce Cloud pages; no JSON blob needed.
+- **Cookie banner**: yes, a consent dialog with a button named "Allow all" (Playwright `getByRole("button", {name: "Allow all"})`),
+  click it before reading. Locale is part of the URL (`/en-sk/`), prices are EUR incl. 23 % Slovak VAT.
+- **Pagination**: counter `.js-productCount` ("11 items" for Endurance, "2 items" for Grail CF SL); grid has `data-page-size="24"`.
+  Both pages fit on one page; behaviour above 24 items (load more / next page) was not observed, so the extractor should
+  require grid tiles == counter and treat a mismatch as broken (REQ-005).
+- **Page marker**: `ul.productGrid__list` plus a numeric `.js-productCount`. Real empty state was NOT observed: a filter with no
+  or an unknown value (`prefv1=ZZZ`, or `CF SL` on Endurance) makes Canyon redirect (HTTP 200) to the parent category
+  (`/gravel-bikes/race/`, `/road-bikes/`, 7 / 49 items). The extractor must verify the final URL path equals the requested path
+  and still contains the `prefv1` value; otherwise broken. `tests/fixtures/canyon/listing-empty.html` is synthetic (counter 0,
+  no tiles) and the markup is an assumption.
+- **Tiles**: only `div[data-product-tile-context="grid"][data-pid]` inside `ul.productGrid__list` are listings. Exclude
+  (a) carousel tiles `data-product-tile-context="slider"` (recently visited/recommended: include other categories, e-bikes and the
+  discounted Grizl 6), (b) promo `<li>` without `data-pid` (custom-bike teaser). Fields: name `a.productTileDefault__productName`
+  text (= `title`); link `href` (absolute, with default colour `?dwvar_<id>_pv_rahmenfarbe=R139_P01`); model id from the URL
+  `/<id>.html` (e.g. 4432; `data-pid` 50043665 is the colour variant, differs per colour); category/price JSON in
+  `data-gtm-impression` (`item_category2` = "Endurance"/"Race", `price` is NET, `gross_price` = shown price) - the visible
+  text is simpler.
+- **Prices**: sale/current `.productTile__priceSale` (text `4.649 €`: `.` thousands, `€` suffix; configurable models show
+  `From 9.300 €`, e.g. Endurace CFR); list price only when discounted: `s.productTile__priceOriginal` (`1.849 €`), plus
+  `.productTile__priceSave` ("You save 200 €") and a badge `.productBadge--pricing` ("-11%"). No grid tile on the two watched
+  pages was discounted on 2026-10-20 (the discounted markup was seen on a carousel tile, kept in the Grail fixture). Ignore
+  `.productTile__priceMonthly` ("or from 775 €/Mo."). The product page uses `.productDescription__priceSale` (original-price
+  element on the product page unobserved, probably analogous).
+- **E-bikes**: the Endurance page contains only road bikes (Endurace:ON lives under `/electric-bikes/`, only mentioned in SEO
+  text). Add `nameExcludes: [":ON"]` as a safety net.
+- **Sizes/availability are NOT in the listing** (colour swatches only). Product page needed (candidates only): size buttons
+  `ul.productConfiguration__optionsList[data-attribute-type="size"] button[data-product-size]`, labels `2XS XS S M L XL 2XL`
+  (letters only, no cm). Available = class `productConfiguration__selectVariant--purchasable`; sold out =
+  `--unpurchasable` + `js-unpurchasable` + `--notifyMe` (+ icon "notify me"). Careful: "unpurchasable" contains the
+  substring "purchasable", match whole class tokens (`classList.contains`). Availability is per colour variant: the page
+  loads the colour in the URL (default if absent; swatch `data-pdp-url` in the tile lists the others). Example Endurace CF 7
+  default colour: 2XS S L available, XS M XL 2XL sold out; Grail CF 7: all 7 sizes available.
+- **Recommended approach**: DOM only. Listing -> filter name/price/discount (list price absent = no discount, so most runs
+  need zero product pages) -> product page for candidates (each colour of a candidate if size matters per colour).
+  Unexplored: the `data-url` on size buttons (`.../Product-Variation?...&dwvar_<id>_pv_rahmengroesse=<size>`) probably returns
+  JSON/HTML per variant and could save page loads.
+### Other services
 - aliexpress.com item page: TBD (T-002)
 - Telegram: via `~/HAL/scripts/tg_send.sh`, usage `echo "text" | tg_send.sh`, plain text (no parse mode). Token managed
   by HAL, never read by watchdog.
