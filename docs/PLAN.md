@@ -9,7 +9,7 @@ because their fixtures come from the spikes.
 
 ## M1: Engine end to end on synthetic pages (+ spikes for the real sites)
 
-### [x] T-001: Spike Rose Bikes + Canyon  (size S)
+### [ ] T-001: Spike Rose Bikes + Canyon  (size S)
 - Goal: learn the real page shape before writing extractors.
 - REQs: REQ-010, REQ-011
 - Acceptance tests to make pass: none (spike).

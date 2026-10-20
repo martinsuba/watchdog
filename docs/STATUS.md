@@ -5,6 +5,8 @@ Open PRs: –
 Blockers: –
 Next step: M1 task loop (T-001 … T-010), then milestone PR for Martin
 
+Done in M1 (PLAN.md ticks go into the milestone PR; task PRs must not touch PLAN.md): T-001
+
 ## Open questions for Martin (needed before M2, ask at M1 end)
 - Rose availability: count yellow traffic light (orderable, delivery in weeks) as available, or only green (in stock)? Spike recommends green only, yellow as a note.
 - Canyon: a non-matching filter silently redirects (HTTP 200) to the parent category. Proposal: Grail watch loads the Grail category and filters "CF SL" by name client-side, instead of relying on the URL filter.
