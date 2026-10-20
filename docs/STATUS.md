@@ -1,15 +1,17 @@
 # Status: watchdog
 Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: T-004 (in progress)
+Current task: T-005 (in progress)
 Open PRs: –
 Blockers: –
 Next step: M1 task loop (T-001 … T-010), then milestone PR for Martin
 
-Done in M1 (PLAN.md ticks go into the milestone PR; task PRs must not touch PLAN.md): T-001, T-002, T-003
+Done in M1 (PLAN.md ticks go into the milestone PR; task PRs must not touch PLAN.md): T-001, T-002, T-003, T-004
 
 ## Follow-ups from reviews (fold into the named task)
 - Corrupt data/state.json crashes the run with a stack trace (loadState outside try) → T-007 (broken/robustness).
 - page.goto ignores HTTP status → T-007 (REQ-005 HTTP 500 test).
+- run.ts writes state (invalidFiles) and may notify invalid-watch alerts before any dry-run guard → T-009 must skip both on --dry-run.
+- Invalid-watch message has no overall length cap beyond the 400-char error → T-010.
 
 ## Open questions for Martin (needed before M2, ask at M1 end)
 - Rose availability: count yellow traffic light (orderable, delivery in weeks) as available, or only green (in stock)? Spike recommends green only, yellow as a note.
@@ -35,3 +37,4 @@ Done in M1 (PLAN.md ticks go into the milestone PR; task PRs must not touch PLAN
 - 2026-10-20: T-002 merged (PR #5): AliExpress NOT blocked from the VPS (3/3 loads), price via Product JSON-LD; SK/EUR cookie pins region. Recommendation: implement extractor in T-013.
 - 2026-10-20: Seeded-bug check: PR #6 removed the REQ-003 'Bike Over' assertion; test-reviewer said CHANGES NEEDED (test-review=failure). Closed unmerged, branch kept. Check passed.
 - 2026-10-20: T-003 merged (PR #7): `watchdog run` works end to end for selectors watches; 8 acceptance tests pass.
+- 2026-10-20: T-004 merged (PR #8, 1 fix round): invalid watch files alert once per file content (hash in state.json `invalidFiles`), not every run.
