@@ -1,5 +1,12 @@
 import { chromium } from "playwright";
 import type { Browser, BrowserContext, Page } from "playwright";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { ExtractError } from "./errors.ts";
+import { pruneSnapshots, snapshotStem } from "./snapshot.ts";
+
+const KEEP_SNAPSHOTS = 5;
+const SNAPSHOT_STEP_MS = 5_000;
 
 const USER_AGENT =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
@@ -15,6 +22,33 @@ export function browserOptionsFromEnv(env: NodeJS.ProcessEnv): BrowserOptions {
   return { timeoutMs, delayMs: () => fixedDelay ?? 3000 + Math.random() * 3000 };
 }
 
+/** Short single-line reason for a failed navigation (REQ-005). The message may contain page-derived text: capped. */
+export function describeNavError(e: unknown): string {
+  if (e instanceof Error && e.name === "TimeoutError") return "timeout";
+  const msg = (e instanceof Error ? e.message : String(e)).split("\n")[0] ?? "";
+  return `load failed: ${msg.replace(/\s+/g, " ").trim()}`.slice(0, 120);
+}
+
+const within = <T>(p: Promise<T>, ms: number) =>
+  Promise.race([p, new Promise<never>((_, rej) => setTimeout(() => rej(new Error("snapshot step timed out")), ms))]);
+
+/** Best effort: HTML + screenshot of whatever the page shows. Content is untrusted data and is never executed. */
+async function saveSnapshot(page: Page, dir: string): Promise<void> {
+  try {
+    mkdirSync(dir, { recursive: true });
+    const stem = join(dir, snapshotStem(new Date()));
+    await within(page.content(), SNAPSHOT_STEP_MS)
+      .then((html) => writeFileSync(`${stem}.html`, html))
+      .catch((e) => console.error(`snapshot html failed: ${e instanceof Error ? e.message : String(e)}`));
+    await within(page.screenshot({ path: `${stem}.png`, timeout: SNAPSHOT_STEP_MS }), SNAPSHOT_STEP_MS).catch((e) =>
+      console.error(`snapshot screenshot failed: ${e instanceof Error ? e.message : String(e)}`),
+    );
+    pruneSnapshots(dir, KEEP_SNAPSHOTS);
+  } catch (e) {
+    console.error(`snapshot failed: ${e instanceof Error ? e.message : String(e)}`);
+  }
+}
+
 /** One Chromium per run; pages are opened one at a time with a delay between them. Navigation only, read-only. */
 export class BrowserSession {
   private browser: Browser | null = null;
@@ -26,7 +60,11 @@ export class BrowserSession {
     this.options = options;
   }
 
-  async withPage<T>(url: string, fn: (page: Page) => Promise<T>): Promise<T> {
+  /**
+   * Opens `url` and runs `fn`. A load failure (timeout, HTTP >= 400, network) throws ExtractError with a short reason.
+   * When anything fails and `snapshotDir` is given, HTML + screenshot are saved there (pruned to the last few).
+   */
+  async withPage<T>(url: string, fn: (page: Page) => Promise<T>, snapshotDir?: string): Promise<T> {
     if (this.context === null) {
       this.browser = await chromium.launch({ headless: true });
       this.context = await this.browser.newContext({ userAgent: USER_AGENT, locale: "en-GB" });
@@ -35,8 +73,16 @@ export class BrowserSession {
     const page = await this.context.newPage();
     try {
       page.setDefaultTimeout(this.options.timeoutMs);
-      await page.goto(url, { timeout: this.options.timeoutMs, waitUntil: "load" });
+      try {
+        const response = await page.goto(url, { timeout: this.options.timeoutMs, waitUntil: "load" });
+        if (response !== null && response.status() >= 400) throw new ExtractError(`HTTP ${response.status()}`);
+      } catch (e) {
+        throw e instanceof ExtractError ? e : new ExtractError(describeNavError(e));
+      }
       return await fn(page);
+    } catch (e) {
+      if (snapshotDir !== undefined) await saveSnapshot(page, snapshotDir);
+      throw e;
     } finally {
       await page.close().catch(() => undefined);
     }

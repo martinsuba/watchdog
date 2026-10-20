@@ -1,20 +1,51 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
-import type { State } from "./types.ts";
+import type { State, WatchState } from "./types.ts";
 
 /** state.json = per-watch state plus a reserved top-level `invalidFiles` map (cannot clash: watch ids are lowercase). */
 export type InvalidFiles = Record<string, string>;
 const INVALID_KEY = "invalidFiles";
 
+const isObject = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v);
+
+/**
+ * A missing file is empty state. A corrupt file (bad JSON or not an object) is moved to state.json.corrupt-<ts>, an
+ * error is logged, and the run continues with empty state (alerts may repeat once) instead of crashing.
+ */
 function readRaw(file: string): Record<string, unknown> {
   if (!existsSync(file)) return {};
-  return JSON.parse(readFileSync(file, "utf8")) as Record<string, unknown>;
+  let parsed: unknown;
+  let reason = "";
+  try {
+    parsed = JSON.parse(readFileSync(file, "utf8"));
+    if (!isObject(parsed)) reason = "top level is not an object";
+  } catch (e) {
+    reason = e instanceof Error ? e.message : String(e);
+  }
+  if (reason === "") return parsed as Record<string, unknown>;
+  const kept = `${file}.corrupt-${new Date().toISOString().replace(/:/g, "-")}`;
+  try {
+    renameSync(file, kept);
+  } catch {
+    // keep going with empty state even if the copy fails
+  }
+  console.error(`state file ${file} is corrupt (${reason}); kept as ${kept}, continuing with empty state`);
+  return {};
 }
 
 export function loadState(file: string): State {
   const raw = readRaw(file);
-  delete raw[INVALID_KEY];
-  return raw as State;
+  const state: State = {};
+  for (const [id, v] of Object.entries(raw)) {
+    if (id === INVALID_KEY || !isObject(v)) continue;
+    const b = v.broken;
+    const broken =
+      isObject(b) && typeof b.reason === "string" && typeof b.since === "string"
+        ? { reason: b.reason, since: b.since }
+        : null;
+    state[id] = { broken, alerted: isObject(v.alerted) ? (v.alerted as WatchState["alerted"]) : {} };
+  }
+  return state;
 }
 
 /** file name -> sha256 of the invalid content that was already alerted. Old state files without the key give {}. */

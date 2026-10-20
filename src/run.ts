@@ -2,11 +2,12 @@ import { join } from "node:path";
 import { BrowserSession } from "./browser.ts";
 import type { BrowserOptions } from "./browser.ts";
 import { diff } from "./diff.ts";
+import { ExtractError } from "./errors.ts";
 import { extract } from "./extractors/selectors.ts";
 import { appendHistory } from "./history.ts";
 import type { HistoryRow } from "./history.ts";
 import { alertInvalid } from "./invalid.ts";
-import { renderMessage } from "./message.ts";
+import { renderBroken, renderMessage, renderRecovered } from "./message.ts";
 import { notify } from "./notify.ts";
 import { matches } from "./rules.ts";
 import { loadInvalidFiles, loadState, saveState } from "./state.ts";
@@ -32,18 +33,46 @@ export async function run(cfg: RunConfig): Promise<number> {
   const invalidFiles = await alertInvalid(invalid, loadInvalidFiles(statePath), (m) => notify(cfg.notifyCmd, m));
   saveState(statePath, state, invalidFiles);
   const session = new BrowserSession(cfg.browser);
+  const send = (m: string) => notify(cfg.notifyCmd, m);
+
+  /**
+   * One watch (REQ-005). Throws when a notification fails (the run then exits 1). State only advances after the matching
+   * notify succeeded, so a failed notification is retried next run. A broken watch keeps its `alerted` state.
+   */
+  async function runWatch(watch: Watch): Promise<void> {
+    const prev = state[watch.id] ?? { broken: null, alerted: {} };
+    let offers: Offer[];
+    try {
+      offers = await fetchOffers(session, watch, join(cfg.dataDir, "broken", watch.id));
+    } catch (e) {
+      if (!(e instanceof ExtractError)) throw e;
+      console.error(`watch ${watch.id} is broken: ${e.reason}`);
+      if (prev.broken !== null) return; // already alerted, stay silent until it recovers
+      await send(renderBroken(watch.name, e.reason));
+      state[watch.id] = { broken: { reason: e.reason, since: new Date().toISOString() }, alerted: prev.alerted };
+      saveState(statePath, state, invalidFiles);
+      return;
+    }
+    if (prev.broken !== null) {
+      await send(renderRecovered(watch.name));
+      state[watch.id] = { broken: null, alerted: prev.alerted };
+      saveState(statePath, state, invalidFiles);
+    }
+    const results = offers.map((offer) => ({ offer, ...matches(offer, watch.match, watch.currency) }));
+    const { alerts, nextAlerted } = diff(
+      prev.alerted,
+      results.filter((r) => r.matched),
+    );
+    appendHistory(historyPath, historyRows(watch, results));
+    if (alerts.length > 0) await send(renderMessage(watch.name, alerts));
+    state[watch.id] = { broken: null, alerted: nextAlerted };
+    saveState(statePath, state, invalidFiles);
+  }
+
   try {
     for (const watch of watches.filter((w) => w.enabled)) {
       try {
-        const offers = await fetchOffers(session, watch);
-        const results = offers.map((offer) => ({ offer, ...matches(offer, watch.match, watch.currency) }));
-        const matching = results.filter((r) => r.matched);
-        const prev = state[watch.id]?.alerted ?? {};
-        const { alerts, nextAlerted } = diff(prev, matching);
-        appendHistory(historyPath, historyRows(watch, results));
-        if (alerts.length > 0) await notify(cfg.notifyCmd, renderMessage(watch.name, alerts));
-        state[watch.id] = { broken: state[watch.id]?.broken ?? null, alerted: nextAlerted };
-        saveState(statePath, state, invalidFiles);
+        await runWatch(watch);
       } catch (e) {
         failed = true;
         console.error(`watch ${watch.id} failed: ${e instanceof Error ? e.message : String(e)}`);
@@ -55,9 +84,23 @@ export async function run(cfg: RunConfig): Promise<number> {
   return failed ? 1 : 0;
 }
 
-async function fetchOffers(session: BrowserSession, watch: Watch): Promise<Offer[]> {
+/** Extracts all pages of a watch; an unexpected currency is a broken page too (snapshot is taken inside withPage). */
+async function fetchOffers(session: BrowserSession, watch: Watch, snapshotDir: string): Promise<Offer[]> {
   const offers: Offer[] = [];
-  for (const url of watch.urls) offers.push(...(await session.withPage(url, (page) => extract(page, watch))));
+  for (const url of watch.urls) {
+    const found = await session.withPage(
+      url,
+      async (page) => {
+        const list = await extract(page, watch);
+        const bad = list.find((o) => matches(o, watch.match, watch.currency).currencyMismatch);
+        if (bad !== undefined)
+          throw new ExtractError(`unexpected currency ${bad.currency} (expected ${watch.currency})`);
+        return list;
+      },
+      snapshotDir,
+    );
+    offers.push(...found);
+  }
   return offers;
 }
 
