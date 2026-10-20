@@ -24,19 +24,15 @@ describe("REQ-004 alerts only on change for the better", () => {
     assert.equal(res.code, 0, res.stderr);
   };
 
-  test(
-    "REQ-004: a newly matching offer alerts once; a second run with the same page sends nothing",
-    todo("T-003"),
-    async () => {
-      page([{ name: "Bike Fresh", price: 2800, sizes: ["S"] }]);
-      await run();
-      assert.equal(messages(env).length, 1);
-      assert.match(messages(env)[0] ?? "", /Bike Fresh/);
-      assert.match(messages(env)[0] ?? "", /\bnew\b/i);
-      await run();
-      assert.equal(messages(env).length, 1, "no second alert");
-    },
-  );
+  test("REQ-004: a newly matching offer alerts once; a second run with the same page sends nothing", async () => {
+    page([{ name: "Bike Fresh", price: 2800, sizes: ["S"] }]);
+    await run();
+    assert.equal(messages(env).length, 1);
+    assert.match(messages(env)[0] ?? "", /Bike Fresh/);
+    assert.match(messages(env)[0] ?? "", /\bnew\b/i);
+    await run();
+    assert.equal(messages(env).length, 1, "no second alert");
+  });
 
   test(
     "REQ-004: an alerted offer whose price drops from 2800 to 2700 sends one 'cheaper' alert",
