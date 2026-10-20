@@ -66,19 +66,19 @@ tests are written ahead of the code.
 - Check: `grep -rn 'todo("' tests/acceptance` lists what is still outstanding.
 
 ## REQ → tests
-Status: all `todo` (run, currently failing against the stub CLI) until the task in the last column un-todos them.
+Status: `todo` until the task in the "Un-todo task" column removes the markers; that task also updates this column.
 
 | REQ | Acceptance test(s) (file `tests/acceptance/...`) | Un-todo task | Status |
 |---|---|---|---|
-| REQ-001 | `req-001-watch-definitions.test.ts`: two valid files both checked; missing field reported once + others run + non-zero exit; unknown site, same; `enabled: false` skipped | T-004 | todo |
-| REQ-002 | `req-002-daily-run.test.ts`: 3 products give 3 offers with name/price/list price/sizes; 2 URLs combined into one watch result | T-003 | todo |
+| REQ-001 | `req-001-watch-definitions.test.ts`: two valid files both checked; missing field reported once + others run + non-zero exit; unknown site, same; `enabled: false` skipped | T-004 | done |
+| REQ-002 | `req-002-daily-run.test.ts`: 3 products give 3 offers with name/price/list price/sizes; 2 URLs combined into one watch result | T-003 | done |
 | REQ-003 | `req-003-conditions.test.ts`: maxPrice 2999/3001; minDiscountPct 15 vs 14.9; sizes no-match; sizes match lists only matching sizes; nameIncludes/nameExcludes; case-insensitive include; out of stock (all sizes unavailable, and `out-of-stock` class without sizes) | T-005 | todo |
-| REQ-004 | `req-004-alert-diff.test.ts`: new offer alerts once (T-003); cheaper; price rise and sizes shrink silent; new size; disappear and reappear; stops matching then forgotten; two offers one message; message content (all T-006) | T-003, T-006 | todo |
+| REQ-004 | `req-004-alert-diff.test.ts`: new offer alerts once (T-003); cheaper; price rise and sizes shrink silent; new size; disappear and reappear; stops matching then forgotten; two offers one message; message content (all T-006) | T-003, T-006 | partial (new offer done; rest T-006) |
 | REQ-005 | `req-005-broken-detection.test.ts`: missing structure alerts once + snapshot; repeat silent; recovered; alert state kept; zero products not broken; timeout with other watches running; HTTP 500; unexpected currency | T-007 | todo |
 | REQ-006 | `req-006-history.test.ts`: 3 rows with columns; 180-day prune; broken check row | T-008 | todo |
-| REQ-007 | `req-007-notification.test.ts`: stdin recorded; failing notify retried next run; unset var refuses to start (all T-003); unset var allowed with `--dry-run` (T-009) | T-003, T-009 | todo |
+| REQ-007 | `req-007-notification.test.ts`: stdin recorded; failing notify retried next run; unset var refuses to start (all T-003); unset var allowed with `--dry-run` (T-009) | T-003, T-009 | partial (3 done; dry-run T-009) |
 | REQ-008 | `req-008-untrusted-pages.test.ts`: hostile name stripped and capped at 120; foreign/`javascript:` link replaced by watch URL per offer; 3500-char message cap | T-010 | todo |
-| REQ-009 | `req-009-selectors-extractor.test.ts`: offers extracted as configured (alternate markup); `parsePrice` formats | T-003 | todo |
+| REQ-009 | `req-009-selectors-extractor.test.ts`: offers extracted as configured (alternate markup); `parsePrice` formats | T-003 | done |
 | REQ-013 | `req-013-dry-run-single-watch.test.ts`: dry run prints, no notify/state/history writes (fresh and existing state); `--watch <id>` fetches only that watch | T-009 | todo |
 | REQ-010, REQ-011, REQ-012 | not in the harness; added by T-011, T-012, T-013 with trimmed real fixtures | T-011 to T-013 | n/a |
 
