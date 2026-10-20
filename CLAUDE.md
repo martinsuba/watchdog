@@ -10,7 +10,7 @@ Watch definitions: `watches/*.yaml` (public). Repair/new watch guide: docs/REPAI
 ## Commands
 - Install: `npm ci` and `npx playwright install --with-deps chromium` (Chromium is already cached on agent-vps)
 - Run: `node src/cli.ts run [--dry-run] [--watch <id>] [--data-dir <dir>] [--watches-dir <dir>]`
-  (needs `WATCHDOG_NOTIFY_CMD` unless `--dry-run`; the CLI is a stub until T-003)
+  (needs `WATCHDOG_NOTIFY_CMD` unless `--dry-run`)
 - Lint / format / typecheck: `npm run lint`, `npm run format:check` (fix: `npm run format`), `npm run typecheck`
 - Unit tests: `npm run test:unit`
 - Acceptance tests: `npm run test:acceptance` (drives the real CLI against a local fake shop server; see docs/TESTS.md)

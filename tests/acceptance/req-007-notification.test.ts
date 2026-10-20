@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { listingHtml } from "./support/pages.ts";
-import { makeEnv, messages, readText, runCli, todo, writeWatch } from "./support/harness.ts";
+import { makeEnv, messages, readText, runCli, writeWatch } from "./support/harness.ts";
 import type { Env } from "./support/harness.ts";
 
 describe("REQ-007 notification via command", () => {
@@ -51,7 +51,7 @@ describe("REQ-007 notification via command", () => {
     assert.equal(readText(env.notifyFile), null);
   });
 
-  test("REQ-007: with WATCHDOG_NOTIFY_CMD unset, --dry-run still works", todo("T-009"), async () => {
+  test("REQ-007: with WATCHDOG_NOTIFY_CMD unset, --dry-run still works", async () => {
     const res = await runCli(env, { noNotify: true, args: ["--dry-run"] });
     assert.equal(res.code, 0, res.stderr);
     assert.match(res.stdout, /Bike Notify/);
