@@ -158,8 +158,53 @@ Server-rendered Salesforce Commerce Cloud pages; no JSON blob needed.
   need zero product pages) -> product page for candidates (each colour of a candidate if size matters per colour).
   Unexplored: the `data-url` on size buttons (`.../Product-Variation?...&dwvar_<id>_pv_rahmengroesse=<size>`) probably returns
   JSON/HTML per variant and could save page loads.
+### aliexpress.com item page (spike T-002, captured 2026-10-20)
+Probe: `scripts/spike/aliexpress.ts` (one load per run), trimmer `scripts/spike/aliexpress-trim.ts`. Fixtures:
+`tests/fixtures/aliexpress/`. Item 1005006902683405 (EliteWheels ENT 2.0), URL without tracking params. 3 page loads in
+total, 30 s apart, desktop Chromium (UA Chrome 131 Linux, viewport 1366x900, locale en-US), no login, no captcha/slider
+interaction, no proxy, no stealth plugin.
+- **Result: NOT blocked.** All 3 loads: HTTP 200, full product page, price + buy buttons rendered. No block/captcha/punish
+  page was seen, so there is no block fixture (not invented). The page loads `baxia` (AliExpress anti-bot SDK,
+  `<script id="aplus-baxia">`, `o.alicdn.com/baxia/...`) but it never challenged us. Caveat: 3 loads from one IP
+  say little about the long-term rate of challenges; the daily cadence (1 load/day) is far lighter than the spike.
+  Likely block markers (NOT observed, from general knowledge, unverified): redirect to a URL containing `/punish` or
+  `_____tmd_____`, `x5secdata` param, baxia dialog element. The extractor should treat "no Product JSON-LD and no
+  `[class*=price-default--current]`" as broken ("blocked or changed") regardless of the exact block page.
+- **Attempts**: (1) no cookie, en-US: redirected to `de.aliexpress.com/item/...?gatewayAdapt=glo2deu`, German UI, EUR,
+  price 354.69 (`site=deu`, ship-to DE by IP/geo guess). (2) cookie `aep_usuc_f=site=glo&c_tp=EUR&region=SK&b_locale=en_US`
+  (AliExpress's own region/currency cookie, set via `addCookies` on `.aliexpress.com`): stays on
+  `www.aliexpress.com/item/1005006902683405.html`, English UI, EUR, ship-to Slovakia flag, price 371.95, shipping EUR 85.40.
+  (3) same as (2) 30 s later: identical, 371.95. A cookie banner and a notification-permission popup overlay the page but do
+  not block reading the DOM (no need to click them).
+- **Currency/locale**: EUR in both cases (datacenter IP is geolocated well enough; the cookie makes it deterministic).
+  The price DEPENDS ON REGION: 354.69 (DE) vs 371.95 (SK; the SK page also shows a 30-day-lowest reference price of 397.56 before discount, ignore it). Watch must pin the
+  region cookie (SK) so the compared price is stable, and the threshold (330 EUR) must be judged against the SK price.
+  Prices are EUR with VAT (`Price includes VAT`), shipping is extra and shown separately.
+- **Where the data lives** (server-rendered, but the page is client-side-rendered afterwards; `window._d_c_.DCData` holds
+  only i18n and images, no price/SKU blob):
+  - Product JSON-LD (`<script type="application/ld+json">`, array; element with `"@type":"Product"`): `name`,
+    `offers.price` (string `"371.95"`, dot decimals), `offers.priceCurrency` (`EUR`), `offers.availability`
+    (`https://schema.org/InStock`). Cleanest source. It reflects the DEFAULT/selected SKU only.
+  - DOM: price `[class*="price-default--current"]` (text `€371.95` with the cookie, `354,69€` with German locale, so
+    prefer JSON-LD); title `h1[data-pl="product-title"]`; SKU options `[class*="sku-item--wrap"]` with
+    `[data-sku-col]` and `sku-item--selected` for the chosen one. CSS class names carry a build hash suffix
+    (`--F8OlYIo`): match by prefix `[class*="..."]`, never the full class.
+  - Stock: in the in-stock state only indirect signals were seen: JSON-LD `InStock`, "Buy now"/"Add to cart" buttons
+    (`[class*="buy-now--buynow"]`, `[class*="add-to-cart--addtocart"]`), `Max. 3 pcs/shopper`. The sold-out markup was not
+    seen (not reproducible on demand).
+  - Price is PER VARIANT (6 colour/depth options x bearing x width x hub). Shown/JSON-LD price is that of the default
+    selection (50mm depth 28mm, steel bearing, 12x100/12x142, Shimano HG, Center Lock). Other variants need clicks (more
+    loads, more risk). For a threshold watch, the default variant price is a reasonable "lowest-ish" proxy, but it can miss a
+    cheaper variant; decide with Martin which variant counts.
+- **Recommended extractor** (`site: aliexpress`): launch with the SK/EUR `aep_usuc_f` cookie, load
+  `https://www.aliexpress.com/item/<id>.html`, wait for DOM content plus ~5-8 s, parse the Product JSON-LD (price,
+  currency, availability), fall back to `price-default--current`. Verify `priceCurrency == EUR` and the final URL host/path
+  still the item (else broken: redirected/blocked). One load per day, no retries beyond one.
+- **Recommendation: implement** the extractor (it works today, JSON-LD is stable and simple), keeping D-006's "broken:
+  blocked" path with the structural check above, and accept it may break without notice. Not worth variant clicking in v1.
+
 ### Other services
-- aliexpress.com item page: TBD (T-002)
+- aliexpress.com item page (spike T-002, captured 2026-10-20): see the section below.
 - Telegram: via `~/HAL/scripts/tg_send.sh`, usage `echo "text" | tg_send.sh`, plain text (no parse mode). Token managed
   by HAL, never read by watchdog.
 
