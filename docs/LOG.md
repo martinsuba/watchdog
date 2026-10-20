@@ -17,3 +17,4 @@ date | gate/phase | what Martin did | could an agent do it? (y/n + why)
 2026-10-19 | harness | Branch protection on main set via gh api | y – done by agent
 2026-10-20 | build | "go M1" | n – gate by design
 2026-10-20 | build | – (seeded-bug check PR #6: test-reviewer correctly rejected the weakened assertion; closed by Lead) | y – done by agent
+2026-10-20 | build | – (M1: 10 task PRs merged by Lead, 2 fix rounds total, 0 escalations) | y – done by agent
