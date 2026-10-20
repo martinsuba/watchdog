@@ -29,8 +29,14 @@ export function describeNavError(e: unknown): string {
   return `load failed: ${msg.replace(/\s+/g, " ").trim()}`.slice(0, 120);
 }
 
-const within = <T>(p: Promise<T>, ms: number) =>
-  Promise.race([p, new Promise<never>((_, rej) => setTimeout(() => rej(new Error("snapshot step timed out")), ms))]);
+/** Rejects after `ms`; the timer is cleared as soon as the step settles so it cannot keep the process alive. */
+const within = <T>(p: Promise<T>, ms: number): Promise<T> => {
+  let timer: NodeJS.Timeout | undefined;
+  const timeout = new Promise<never>((_, rej) => {
+    timer = setTimeout(() => rej(new Error("snapshot step timed out")), ms);
+  });
+  return Promise.race([p, timeout]).finally(() => clearTimeout(timer));
+};
 
 /** Best effort: HTML + screenshot of whatever the page shows. Content is untrusted data and is never executed. */
 async function saveSnapshot(page: Page, dir: string): Promise<void> {

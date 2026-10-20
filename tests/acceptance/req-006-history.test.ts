@@ -8,7 +8,6 @@ import {
   readText,
   runCli,
   seedHistory,
-  todo,
   writeWatch,
 } from "./support/harness.ts";
 import type { Env } from "./support/harness.ts";
@@ -22,7 +21,7 @@ describe("REQ-006 history", () => {
   });
   afterEach(() => env.cleanup());
 
-  test("REQ-006: a run extracting 3 offers appends 3 rows with the listed columns", todo("T-008"), async () => {
+  test("REQ-006: a run extracting 3 offers appends 3 rows with the listed columns", async () => {
     writeWatch(env, { id: "hist", urls: [env.server.url("/products-3.html")], match: { maxPrice: 3000 } });
     const before = Date.now();
     const res = await runCli(env);
@@ -47,30 +46,26 @@ describe("REQ-006 history", () => {
     assert.equal(readHistory(env).length, 6, "a second run appends 3 more rows");
   });
 
-  test(
-    "REQ-006: rows older than 180 days are pruned at the start of a run, newer rows are kept",
-    todo("T-008"),
-    async () => {
-      seedHistory(env, [
-        `${daysAgo(200)},hist,old-offer,Ancient Bike,100,,EUR,S,no,`,
-        `${daysAgo(181)},hist,old-offer-2,Stale Bike,100,,EUR,S,no,`,
-        `${daysAgo(179)},hist,keep-offer,Recent Bike,100,,EUR,S,no,`,
-        `${daysAgo(10)},hist,keep-offer-2,Newer Bike,100,,EUR,S,no,`,
-      ]);
-      writeWatch(env, { id: "hist", urls: [env.server.url("/products-b.html")] });
-      const res = await runCli(env);
-      assert.equal(res.code, 0, res.stderr);
-      const names = readHistory(env).map((r) => r.name);
-      assert.ok(!names.includes("Ancient Bike"));
-      assert.ok(!names.includes("Stale Bike"));
-      assert.ok(names.includes("Recent Bike"));
-      assert.ok(names.includes("Newer Bike"));
-      assert.ok(names.includes("Aero Delta"), "new row appended");
-      assert.equal(names.length, 3);
-    },
-  );
+  test("REQ-006: rows older than 180 days are pruned at the start of a run, newer rows are kept", async () => {
+    seedHistory(env, [
+      `${daysAgo(200)},hist,old-offer,Ancient Bike,100,,EUR,S,no,`,
+      `${daysAgo(181)},hist,old-offer-2,Stale Bike,100,,EUR,S,no,`,
+      `${daysAgo(179)},hist,keep-offer,Recent Bike,100,,EUR,S,no,`,
+      `${daysAgo(10)},hist,keep-offer-2,Newer Bike,100,,EUR,S,no,`,
+    ]);
+    writeWatch(env, { id: "hist", urls: [env.server.url("/products-b.html")] });
+    const res = await runCli(env);
+    assert.equal(res.code, 0, res.stderr);
+    const names = readHistory(env).map((r) => r.name);
+    assert.ok(!names.includes("Ancient Bike"));
+    assert.ok(!names.includes("Stale Bike"));
+    assert.ok(names.includes("Recent Bike"));
+    assert.ok(names.includes("Newer Bike"));
+    assert.ok(names.includes("Aero Delta"), "new row appended");
+    assert.equal(names.length, 3);
+  });
 
-  test("REQ-006: a broken check appends one row with the reason", todo("T-008"), async () => {
+  test("REQ-006: a broken check appends one row with the reason", async () => {
     writeWatch(env, { id: "hist", urls: [env.server.url("/no-structure.html")] });
     await runCli(env);
     const rows = readHistory(env);

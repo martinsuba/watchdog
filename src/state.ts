@@ -1,5 +1,5 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import { dirname } from "node:path";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 import type { State, WatchState } from "./types.ts";
 
 /** state.json = per-watch state plus a reserved top-level `invalidFiles` map (cannot clash: watch ids are lowercase). */
@@ -64,4 +64,18 @@ export function saveState(file: string, state: State, invalidFiles: InvalidFiles
       "\n",
   );
   renameSync(tmp, file);
+}
+
+/** Keeps the newest `keep` state.json.corrupt-<ts> backups (names sort by their ISO timestamp), deletes the rest. */
+export function pruneCorruptBackups(file: string, keep = 3): void {
+  try {
+    const prefix = `${basename(file)}.corrupt-`;
+    const backups = readdirSync(dirname(file))
+      .filter((f) => f.startsWith(prefix))
+      .sort();
+    for (const f of backups.slice(0, Math.max(0, backups.length - keep)))
+      rmSync(join(dirname(file), f), { force: true });
+  } catch {
+    // housekeeping only: a missing data dir or a locked file must not fail the run
+  }
 }
