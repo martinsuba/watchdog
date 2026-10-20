@@ -36,7 +36,7 @@ export async function run(cfg: RunConfig): Promise<number> {
     for (const watch of watches.filter((w) => w.enabled)) {
       try {
         const offers = await fetchOffers(session, watch);
-        const results = offers.map((offer) => ({ offer, ...matches(offer, watch.match) }));
+        const results = offers.map((offer) => ({ offer, ...matches(offer, watch.match, watch.currency) }));
         const matching = results.filter((r) => r.matched);
         const prev = state[watch.id]?.alerted ?? {};
         const { alerts, nextAlerted } = diff(prev, matching);
