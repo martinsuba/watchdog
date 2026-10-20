@@ -63,4 +63,25 @@ describe("loadWatches", () => {
       assert.equal(loadWatches(dir).watches[0]?.enabled, false);
     });
   });
+  test("errors name the file, the field path and the problem", () => {
+    withDir({ "b.yaml": "id: b\nname: B\nsite: nope\nurls: []\n" }, (dir) => {
+      const e = loadWatches(dir).invalid[0]?.error ?? "";
+      assert.match(e, /^b\.yaml: /);
+      assert.match(e, /site: /);
+      assert.match(e, /urls: /);
+    });
+  });
+  test("a YAML syntax error is reported as single capped line", () => {
+    withDir({ "c.yaml": "id: [unclosed\n" + "x".repeat(2000) }, (dir) => {
+      const e = loadWatches(dir).invalid[0]?.error ?? "";
+      assert.ok(e.startsWith("c.yaml: "));
+      assert.ok(!e.includes("\n"));
+      assert.ok(e.length <= 400);
+    });
+  });
+  test("an uppercase or invalid id is rejected", () => {
+    withDir({ "Bad_Id.yaml": valid.replace("id: a", "id: Bad_Id") }, (dir) => {
+      assert.match(loadWatches(dir).invalid[0]?.error ?? "", /id: /);
+    });
+  });
 });

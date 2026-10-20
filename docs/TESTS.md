@@ -70,7 +70,7 @@ Status: `todo` until the task in the "Un-todo task" column removes the markers; 
 
 | REQ | Acceptance test(s) (file `tests/acceptance/...`) | Un-todo task | Status |
 |---|---|---|---|
-| REQ-001 | `req-001-watch-definitions.test.ts`: two valid files both checked; missing field reported once + others run + non-zero exit; unknown site, same; `enabled: false` skipped | T-004 | todo |
+| REQ-001 | `req-001-watch-definitions.test.ts`: two valid files both checked; missing field reported once + others run + non-zero exit; unknown site, same; `enabled: false` skipped | T-004 | done |
 | REQ-002 | `req-002-daily-run.test.ts`: 3 products give 3 offers with name/price/list price/sizes; 2 URLs combined into one watch result | T-003 | done |
 | REQ-003 | `req-003-conditions.test.ts`: maxPrice 2999/3001; minDiscountPct 15 vs 14.9; sizes no-match; sizes match lists only matching sizes; nameIncludes/nameExcludes; case-insensitive include; out of stock (all sizes unavailable, and `out-of-stock` class without sizes) | T-005 | todo |
 | REQ-004 | `req-004-alert-diff.test.ts`: new offer alerts once (T-003); cheaper; price rise and sizes shrink silent; new size; disappear and reappear; stops matching then forgotten; two offers one message; message content (all T-006) | T-003, T-006 | partial (new offer done; rest T-006) |

@@ -42,9 +42,17 @@ const watchSchema = z
     }
   });
 
+/** `error` is a single capped line: "<file>: <field path>: <problem>[; ...]". File content is untrusted. */
 export type InvalidWatch = { file: string; error: string };
 
-/** Loads watches/*.yaml; invalid files are returned, not thrown, so the others still run. T-004 hardens the reporting. */
+const MAX_ERROR_LENGTH = 400;
+
+function invalidWatch(file: string, problem: string): InvalidWatch {
+  const line = `${file}: ${problem}`.replace(/\s+/g, " ").trim();
+  return { file, error: line.length > MAX_ERROR_LENGTH ? `${line.slice(0, MAX_ERROR_LENGTH - 1)}…` : line };
+}
+
+/** Loads watches/*.yaml; invalid files are returned, not thrown, so the others still run (REQ-001). */
 export function loadWatches(dir: string): { watches: Watch[]; invalid: InvalidWatch[] } {
   const watches: Watch[] = [];
   const invalid: InvalidWatch[] = [];
@@ -55,17 +63,19 @@ export function loadWatches(dir: string): { watches: Watch[]; invalid: InvalidWa
     try {
       const parsed = watchSchema.safeParse(parse(readFileSync(join(dir, file), "utf8")));
       if (!parsed.success) {
-        invalid.push({
-          file,
-          error: parsed.error.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`).join("; "),
-        });
+        invalid.push(
+          invalidWatch(
+            file,
+            parsed.error.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`).join("; "),
+          ),
+        );
       } else if (parsed.data.id !== file.slice(0, -".yaml".length)) {
-        invalid.push({ file, error: `id "${parsed.data.id}" must equal the file name` });
+        invalid.push(invalidWatch(file, `id: "${parsed.data.id}" must equal the file name`));
       } else {
         watches.push(parsed.data as Watch);
       }
     } catch (e) {
-      invalid.push({ file, error: e instanceof Error ? e.message : String(e) });
+      invalid.push(invalidWatch(file, e instanceof Error ? (e.message.split("\n")[0] ?? "unreadable") : "unreadable"));
     }
   }
   return { watches, invalid };

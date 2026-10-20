@@ -5,7 +5,7 @@ import { diff } from "./diff.ts";
 import { extract } from "./extractors/selectors.ts";
 import { appendHistory } from "./history.ts";
 import type { HistoryRow } from "./history.ts";
-import { renderMessage } from "./message.ts";
+import { renderInvalidWatch, renderMessage } from "./message.ts";
 import { notify } from "./notify.ts";
 import { matches } from "./rules.ts";
 import { loadState, saveState } from "./state.ts";
@@ -23,7 +23,16 @@ export type RunConfig = {
 export async function run(cfg: RunConfig): Promise<number> {
   const { watches, invalid } = loadWatches(cfg.watchesDir);
   let failed = invalid.length > 0;
-  for (const i of invalid) console.error(`invalid watch ${i.file}: ${i.error}`);
+  for (const i of invalid) {
+    console.error(`invalid watch ${i.error}`);
+    // Not de-duplicated across runs: state.json is keyed by watch id and an invalid file has no reliable id. The
+    // non-zero exit and a daily alert keep nagging until the file is fixed.
+    try {
+      await notify(cfg.notifyCmd, renderInvalidWatch(i));
+    } catch (e) {
+      console.error(`notify failed for invalid watch ${i.file}: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
 
   const statePath = join(cfg.dataDir, "state.json");
   const historyPath = join(cfg.dataDir, "history.csv");

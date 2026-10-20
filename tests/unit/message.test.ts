@@ -1,6 +1,6 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { renderMessage } from "../../src/message.ts";
+import { renderInvalidWatch, renderMessage } from "../../src/message.ts";
 
 const alert = (name: string) => ({
   reason: "new" as const,
@@ -25,5 +25,14 @@ describe("renderMessage", () => {
     assert.match(msg, /new/i);
     assert.match(msg, /2800/);
     assert.match(msg, /http:\/\/x\/First/);
+  });
+});
+
+describe("renderInvalidWatch", () => {
+  test("contains 'invalid watch', the file and the problem", () => {
+    const m = renderInvalidWatch({ file: "x.yaml", error: "x.yaml: urls: too small" });
+    assert.match(m, /invalid watch/i);
+    assert.match(m, /x\.yaml/);
+    assert.match(m, /urls: too small/);
   });
 });
