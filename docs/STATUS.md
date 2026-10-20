@@ -1,11 +1,11 @@
 # Status: watchdog
 Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: T-006 (in progress)
+Current task: T-007 (in progress)
 Open PRs: –
 Blockers: –
 Next step: M1 task loop (T-001 … T-010), then milestone PR for Martin
 
-Done in M1 (PLAN.md ticks go into the milestone PR; task PRs must not touch PLAN.md): T-001, T-002, T-003, T-004, T-005
+Done in M1 (PLAN.md ticks go into the milestone PR; task PRs must not touch PLAN.md): T-001, T-002, T-003, T-004, T-005, T-006
 
 ## Follow-ups from reviews (fold into the named task)
 - Corrupt data/state.json crashes the run with a stack trace (loadState outside try) → T-007 (broken/robustness).
@@ -19,6 +19,7 @@ Done in M1 (PLAN.md ticks go into the milestone PR; task PRs must not touch PLAN
 - Canyon: a non-matching filter silently redirects (HTTP 200) to the parent category. Proposal: Grail watch loads the Grail category and filters "CF SL" by name client-side, instead of relying on the URL filter.
 - Canyon cookie banner: extractor clicks "Allow all" (spike did). Alternative: reject/necessary-only if the banner offers it. Lead proposes necessary-only when available.
 - AliExpress: only the default variant is read (v1). Is the SK region (ship-to Slovakia, EUR) the right price to compare with 330 EUR? Today SK 371.95, DE 354.69.
+- Size flapping: a size that disappears and comes back re-alerts as "new size" each time (REQ-004 as built in T-006). OK, or require it to stay away N days first?
 
 ## Decisions log
 - 2026-10-16: project created
@@ -40,3 +41,4 @@ Done in M1 (PLAN.md ticks go into the milestone PR; task PRs must not touch PLAN
 - 2026-10-20: T-003 merged (PR #7): `watchdog run` works end to end for selectors watches; 8 acceptance tests pass.
 - 2026-10-20: T-004 merged (PR #8, 1 fix round): invalid watch files alert once per file content (hash in state.json `invalidFiles`), not every run.
 - 2026-10-20: T-005 merged (PR #9): all REQ-003 conditions; currency mismatch never matches (flag for T-007).
+- 2026-10-20: T-006 merged (PR #10): cheaper vs last alerted price, new size, forget on stop-matching, one message per watch with reasons.
