@@ -1,5 +1,7 @@
 import type { Page } from "playwright";
+import type { CookieSpec } from "../browser.ts";
 import type { Offer, Watch } from "../types.ts";
+import { ALIEXPRESS_COOKIES, extract as extractAliexpress } from "./aliexpress.ts";
 import { extract as extractCanyon } from "./canyon.ts";
 import { extract as extractRose } from "./rose.ts";
 import { extract as extractSelectors } from "./selectors.ts";
@@ -21,10 +23,16 @@ export const EXTRACTORS: Record<string, Extractor> = {
   selectors: extractSelectors,
   rose: extractRose,
   canyon: extractCanyon,
+  aliexpress: extractAliexpress,
 };
 
 export function extractorFor(site: string): Extractor {
   const found = Object.hasOwn(EXTRACTORS, site) ? EXTRACTORS[site] : undefined;
   if (found === undefined) throw new Error(`no extractor for site "${site}"`);
   return found;
+}
+
+/** Cookies to set in the browser before a site's pages are loaded (AliExpress: region/currency pin). */
+export function cookiesFor(site: string): CookieSpec[] {
+  return site === "aliexpress" ? ALIEXPRESS_COOKIES : [];
 }
