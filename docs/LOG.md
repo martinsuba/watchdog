@@ -22,3 +22,6 @@ date | gate/phase | what Martin did | could an agent do it? (y/n + why)
 2026-10-22 | build | Merged M1 PR #15, "go M2" | n – gate by design
 2026-10-22 | build | "merge it and avoid these later" (T-011 builder limitations) | y – Lead should not have stopped; rule relaxed
 2026-10-22 | M2 end | Switched Lead to Opus for milestone review (/model opus) | n – Lead cannot switch its own model
+2026-10-22 | M2 gate | Merged milestone PR #20 | n – gate by design
+2026-10-22 | deploy/plan | "deploy, mutation before" → plan v3 (M3: T-015 mutation report), deploy after M3 | n – Martin's priority call
+2026-10-22 | framework | Correction: don't ask to switch models mid-session, it is not effective; Lead stays on Opus, lighter tasks to subagents on a lower model | y – Lead should have followed the 2026-10-19 decision (one model in the Lead session) instead of suggesting /model switches

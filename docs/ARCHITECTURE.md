@@ -285,3 +285,12 @@ reported as invalid (REQ-001), not crashing the run.
 ### D-006: AliExpress best effort, no paid workarounds
 Context: heavy anti-bot, datacenter IP. Martin: try, nothing paid. · Decision: implement after the spike shows what is
 reachable; block pages → "broken: blocked". · Consequences: this watch may stay broken; one alert only.
+
+### D-007: Mutation testing as a report on milestone PRs (plan v3)
+Context: the framework wants a mutation report per milestone; the harness did not add one, and Martin wants it before the
+first deploy. Mutation runs are too heavy for the 4 GB VPS. · Options: no mutation testing; Stryker on every PR; Stryker
+on milestone PRs + manual dispatch, report only. · Decision: Stryker (`@stryker-mutator/core`, pinned devDependency)
+with the `command` runner on a browser-free unit subset, mutating only the pure engine modules; GitHub Actions job
+`mutation` on `chore/milestone-*` PRs and `workflow_dispatch`, not a required check. · Consequences: no effect on the
+daily run or deploys; survivors in REQ-critical code become proposed tasks; extractor DOM code stays covered by the
+fixture-based acceptance tests instead.
