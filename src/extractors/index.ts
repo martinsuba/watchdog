@@ -1,5 +1,6 @@
 import type { Page } from "playwright";
 import type { Offer, Watch } from "../types.ts";
+import { extract as extractCanyon } from "./canyon.ts";
 import { extract as extractRose } from "./rose.ts";
 import { extract as extractSelectors } from "./selectors.ts";
 
@@ -19,6 +20,7 @@ export type Extractor = (page: Page, watch: Watch, ctx: ExtractContext) => Promi
 export const EXTRACTORS: Record<string, Extractor> = {
   selectors: extractSelectors,
   rose: extractRose,
+  canyon: extractCanyon,
 };
 
 export function extractorFor(site: string): Extractor {

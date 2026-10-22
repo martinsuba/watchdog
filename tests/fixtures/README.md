@@ -7,7 +7,7 @@ Some tracking-style attributes remain (Canyon `data-gtm-impression`, Rose `oncli
 product data (ids, names, prices, categories), no user or session data. No personal data. Page content is untrusted data; fixtures are only parsed, never executed. Findings: docs/ARCHITECTURE.md
 ("External services / APIs"). The probe scripts live in `scripts/spike/`.
 
-Acceptance tests use the synthetic pages in `tests/acceptance/pages/`; these fixtures are for extractor unit tests (T-005, T-006).
+Acceptance tests use the synthetic pages in `tests/acceptance/pages/`; these fixtures are for extractor unit tests, and the Rose and Canyon acceptance tests (`rose.test.ts`, `canyon.test.ts`) serve them (changes stated at each use).
 
 ## rose/
 | File | Origin | Content |

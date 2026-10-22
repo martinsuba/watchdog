@@ -1,0 +1,12 @@
+id: canyon-endurance
+name: Canyon Endurance (L/XL)
+site: canyon
+urls:
+  - https://www.canyon.com/en-sk/road-bikes/endurance-bikes/
+currency: EUR
+match:
+  nameExcludes: [":ON"] # e-bikes (Endurace:ON) are excluded
+  maxPrice: 4500
+  minDiscountPct: 15
+  sizes: [L, XL]
+note: The Endurance page lists road bikes only; ":ON" is a safety net. Sizes come from the product pages, any colour.

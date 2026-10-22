@@ -164,6 +164,19 @@ Server-rendered Salesforce Commerce Cloud pages; no JSON blob needed.
   need zero product pages) -> product page for candidates (each colour of a candidate if size matters per colour).
   Unexplored: the `data-url` on size buttons (`.../Product-Variation?...&dwvar_<id>_pv_rahmengroesse=<size>`) probably returns
   JSON/HTML per variant and could save page loads.
+- **Implementation (T-012)** `src/extractors/canyon.ts` (+ `consent.ts`), registered as `site: canyon`. Offer id = model id from the
+  product url (no query). Live check 2026-10-22: the results header holds the counter (`.productFilters__countResults
+  .js-productCount`; a second `.js-productCount` in the filter list reads "6 items" and must not be used); tiles are selected
+  by `data-product-tile-context="grid"` + `data-pid` (the saved fixtures no longer nest them under the `<ul>`). Grid tiles must
+  equal the counter (else broken). Every page is checked against the requested one: a final url that is not a watch url
+  (path, plus any filter parameter) is broken ("redirected to ..."), likewise a product page whose url no longer ends in the
+  tile's model id. Candidates (name/price/discount from the listing) get one product page per colour (tile href + swatch
+  `data-pdp-url`, max 8); a size is available when any colour has it purchasable. Cookie banner (live: buttons "Allow all" /
+  "Only necessary"): `dismissCookieBanner` clicks a necessary-only/reject button if there is one, else "Allow all", nothing
+  else (role locators see open shadow roots); waits up to 1.5 s on the listing page, none on product pages. The Grail watch
+  loads the whole category `/gravel-bikes/race/grail/` (6 models on 2026-10-22) and filters by name: the site's "CF SL" filter
+  shows "Grail CF 7" / "Grail CF 7 Speed", so the names contain "Grail CF" but not "CF SL"; CF SLX and CFR are excluded by name.
+  Run time (VPS, default 3-6 s page delay): ~6 s per Canyon watch without candidates, +~18 s per candidate (3 colour pages).
 
 ### aliexpress.com item page (spike T-002, captured 2026-10-20)
 Probe: `scripts/spike/aliexpress.ts` (one load per run), trimmer `scripts/spike/aliexpress-trim.ts`. Fixtures:
