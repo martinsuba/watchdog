@@ -1,9 +1,9 @@
 # Status: watchdog
 Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
 Current task: – (M2 tasks done; T-011 #16, T-012 #17, T-013 #18, T-014 #19 merged; M2 order T-011, T-012, T-013, T-014)
-Open PRs: –
+Open PRs: milestone PR M2 (chore/milestone-M2)
 Blockers: –
-Next step: Opus milestone review of M2 against the PRD, then milestone PR for Martin; decide on mutation testing (plan PR + label) and deploy (docs/DEPLOY.md).
+Next step: Martin reviews + merges the M2 milestone PR; decide on mutation testing (plan PR + label) and deploy (docs/DEPLOY.md).
 
 Done in M1: T-001 … T-010 (all; merged as PR #15)
 Done in M2: T-011, T-012, T-013, T-014
@@ -56,3 +56,4 @@ T-011 also covers (from M1 follow-ups): extractor registry/dispatcher in run.ts,
 - 2026-10-22: T-012 merged (PR #17, 0 fix rounds). Grail watch uses nameIncludes "Grail CF" (site "CF SL" filter lists "Grail CF 7"; names never contain "CF SL"); reviewers agreed with PRD intent. Follow-ups: model rename silently matches nothing; no test for CFR/SLX exclusion, maxPrice boundaries, XS-only; redirect check accepts any of a watch's URLs (single-URL watches today).
 - 2026-10-22: T-013 merged (PR #18, 0 fix rounds). AliExpress was BLOCKED (reCAPTCHA) from the VPS on 2026-10-22; extractor reports "blocked" as broken (~10 s). aliexpress-ent may be broken on many days (accepted best effort). Follow-ups: no real block-page fixture; successful live SK price read not seen since T-002; block-text regexes could over-flag (fails safe); redirect to non-item page waits 12 s. CI on PR #18 took 13 min (vs ~2.3 min), worth watching.
 - 2026-10-22: T-014 merged (PR #19, 0 fix rounds). M2 tasks all merged; waiting for Opus milestone review + milestone PR. Follow-ups: cron-run.sh lock fd inherited by children, exit 75 on overlap shows as cron failure, trap RETURN cosmetic. Mutation testing still not in PLAN.
+- 2026-10-22: Opus M2 review done: meets REQ-010/011/012 (best effort) and T-014; live dry run of all 5 watches 73 s, exit 0, Rose/Canyon healthy, AliExpress broken "blocked". Milestone PR opened.

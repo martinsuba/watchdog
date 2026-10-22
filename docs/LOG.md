@@ -21,3 +21,4 @@ date | gate/phase | what Martin did | could an agent do it? (y/n + why)
 2026-10-22 | M1 review | Answered 5 open questions ("yes to everything") | n – product decisions
 2026-10-22 | build | Merged M1 PR #15, "go M2" | n – gate by design
 2026-10-22 | build | "merge it and avoid these later" (T-011 builder limitations) | y – Lead should not have stopped; rule relaxed
+2026-10-22 | M2 end | Switched Lead to Opus for milestone review (/model opus) | n – Lead cannot switch its own model
