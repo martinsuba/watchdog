@@ -1,7 +1,7 @@
 # Status: watchdog
 Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: T-011 (in progress; M2 order T-011, T-012, T-013, T-014)
-Open PRs: –
+Current task: T-011 (PR #16 ready, waiting for Martin; M2 order T-011, T-012, T-013, T-014)
+Open PRs: #16 T-011 (ci, guard, test-review green; reviewer + test-reviewer APPROVE for 1b0fcee)
 Blockers: –
 Next step: M2 task loop; then milestone PR for Martin. Mutation testing (Stryker, needs .github/workflows) is NOT in PLAN.md: needs a plan PR + Martin label, propose at M2 end or earlier.
 
@@ -51,3 +51,4 @@ T-011 also covers (from M1 follow-ups): extractor registry/dispatcher in run.ts,
 - 2026-10-20: T-010 merged (PR #14, 1 fix round: quadratic regex in sanitizer replaced by linear scanner): text sanitizing, own-domain link rule, 3500-char cap; all 46 acceptance tests pass. M1 complete.
 - 2026-10-22: Martin answered the 5 M1 questions with the Lead's proposals (see "Answers"); approved mutation testing as an M2 task.
 - 2026-10-22: Martin merged M1 (PR #15), "go M2". Dispatcher + stable ids folded into T-011 (no PLAN change).
+- 2026-10-22: T-011 PR #16 ready, not merged by Lead: builder listed "questionable" items (merge condition e). Follow-ups: shadow-root consent dialog acceptance test; fixed 2 s settle per size; id params by name only; listing completeness only structural.
