@@ -1,7 +1,7 @@
 # Status: watchdog
 Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: T-015 (in progress)
-Open PRs: –
+Current task: T-015 (PR #22 ready: ci, guard, test-review green, reviewer + test-reviewer APPROVE for 0cb8e23; waiting for Martin's acceptance-change label per PLAN)
+Open PRs: #22 T-015
 Blockers: –
 Next step: T-015 (needs Martin's acceptance-change label: workflow change); M3 milestone PR with mutation report; then deploy v1.0.0.
 
