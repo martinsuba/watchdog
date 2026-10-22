@@ -1,22 +1,26 @@
 # Status: watchdog
 Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: T-010 (in progress)
-Open PRs: –
+Current task: – (M1 complete)
+Open PRs: milestone PR M1 (chore/milestone-M1)
 Blockers: –
-Next step: M1 task loop (T-001 … T-010), then milestone PR for Martin
+Next step: Martin merges the M1 milestone PR (#15) and says "go M2" (questions answered, see below)
 
-Done in M1 (PLAN.md ticks go into the milestone PR; task PRs must not touch PLAN.md): T-001, T-002, T-003, T-004, T-005, T-006, T-007, T-008, T-009
+Done in M1: T-001 … T-010 (all; PLAN.md ticked in the milestone PR)
 
-## Follow-ups from reviews (fold into the named task)
-- Invalid-watch message has no overall length cap beyond the 400-char error → T-010.
-- Watch schema accepts blank terms (`nameIncludes: [""]` matches everything); trim + min(1) for names/sizes; make `watchCurrency` required in rules.matches → T-010 (input hygiene).
+## Follow-ups from reviews / milestone review (for M2)
+- M2 needs a site dispatcher: run.ts calls the selectors extractor directly (extractors/<site> registry with T-011).
+- Offer ids from links keep query strings: a shop adding per-visit params would make every offer "new" daily. Site extractors use stable ids (Rose SKU, Canyon model id from URL); selectors extractor should strip query/tracking params or allow an id selector.
+- No overall run time budget (G1 < 5 min): Rose product-page visits per candidate add up; measure in T-011 staging dry run.
+- Mutation testing (framework: Stryker report on milestone PRs) not set up: no mutation.yml in the harness. Adding it touches .github/workflows (needs Martin's label).
+- sanitize stripMarkup lowercases for index search (U+0130 length shift); harmless (final pass removes all < >), cosmetic.
 
-## Open questions for Martin (needed before M2, ask at M1 end)
-- Rose availability: count yellow traffic light (orderable, delivery in weeks) as available, or only green (in stock)? Spike recommends green only, yellow as a note.
-- Canyon: a non-matching filter silently redirects (HTTP 200) to the parent category. Proposal: Grail watch loads the Grail category and filters "CF SL" by name client-side, instead of relying on the URL filter.
-- Canyon cookie banner: extractor clicks "Allow all" (spike did). Alternative: reject/necessary-only if the banner offers it. Lead proposes necessary-only when available.
-- AliExpress: only the default variant is read (v1). Is the SK region (ship-to Slovakia, EUR) the right price to compare with 330 EUR? Today SK 371.95, DE 354.69.
-- Size flapping: a size that disappears and comes back re-alerts as "new size" each time (REQ-004 as built in T-006). OK, or require it to stay away N days first?
+## Answers from Martin (2026-10-22, "yes to everything" = Lead's proposals) – for M2 tasks
+- Rose availability: only green (in stock) counts as available; yellow (orderable, delivery in weeks) only as a note.
+- Canyon filter: Grail watch loads the Grail category and filters "CF SL" by name client-side, not via the URL filter.
+- Canyon cookie banner: click necessary-only when the banner offers it, otherwise "Allow all".
+- AliExpress: default variant only, SK region (EUR) price compared with 329.99.
+- Size flapping: keep as built (re-alert as "new size" each time).
+- Mutation testing (Stryker, report only) added as an M2 task; touches .github/workflows, so that PR needs Martin's `acceptance-change` label.
 
 ## Decisions log
 - 2026-10-16: project created
@@ -42,3 +46,5 @@ Done in M1 (PLAN.md ticks go into the milestone PR; task PRs must not touch PLAN
 - 2026-10-20: T-007 merged (PR #11): broken/recovered alerts, HTTP status check, snapshots (every failing run, newest 5 kept), corrupt state.json renamed + empty state (alerts may repeat once). Exit 0 for an alerted broken watch; non-zero only for invalid files, notify failures, crashes.
 - 2026-10-20: T-008 merged (PR #12): history prune (180 d, atomic), broken rows, RFC 4180 + formula-injection guard; corrupt-state backups capped at 3.
 - 2026-10-20: T-009 merged (PR #13): --dry-run has no side effects (byte-identical data dir), --watch <id> (unknown/invalid id exits 2; disabled watch runs when named).
+- 2026-10-20: T-010 merged (PR #14, 1 fix round: quadratic regex in sanitizer replaced by linear scanner): text sanitizing, own-domain link rule, 3500-char cap; all 46 acceptance tests pass. M1 complete.
+- 2026-10-22: Martin answered the 5 M1 questions with the Lead's proposals (see "Answers"); approved mutation testing as an M2 task.
