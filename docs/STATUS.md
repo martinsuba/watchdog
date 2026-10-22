@@ -1,12 +1,13 @@
 # Status: watchdog
 Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: T-015 (PR #22 ready: ci, guard, test-review green, reviewer + test-reviewer APPROVE for 0cb8e23; waiting for Martin's acceptance-change label per PLAN)
-Open PRs: #22 T-015
+Current task: – (M3 task T-015 merged as PR #22; mutation report running on the M3 milestone PR)
+Open PRs: milestone PR M3 (chore/milestone-M3)
 Blockers: –
-Next step: T-015 (needs Martin's acceptance-change label: workflow change); M3 milestone PR with mutation report; then deploy v1.0.0.
+Next step: mutation report into the M3 milestone PR; Martin merges it; then deploy v1.0.0 (approved: "deploy").
 
 Done in M1: T-001 … T-010 (all; merged as PR #15)
 Done in M2: T-011, T-012, T-013, T-014
+Done in M3: T-015
 T-011 also covers (from M1 follow-ups): extractor registry/dispatcher in run.ts, stable offer ids (strip query/tracking params in selectors extractor).
 
 ## Follow-ups from reviews / milestone review (for M2)
@@ -60,3 +61,4 @@ T-011 also covers (from M1 follow-ups): extractor registry/dispatcher in run.ts,
 - 2026-10-22: Martin merged M2 (PR #20). Decided: deploy, but mutation testing first (plan v3: M3 = T-015).
 - 2026-10-22: Martin: the Lead session stays on Opus; do not ask him to switch models in this session (switching mid-session is not effective). Lighter work goes to subagents with an explicitly lower model (builder/reviewer/test-reviewer: sonnet). This overrides the framework's "Opus only for planning/milestone reviews" for this project.
 - 2026-10-22: Plan v3 merged (PR #21); Martin: "go M3".
+- 2026-10-22: Martin: "label 22" → Lead added acceptance-change; T-015 merged (PR #22, 0 fix rounds).
