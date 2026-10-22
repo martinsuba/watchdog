@@ -81,6 +81,7 @@ Status: `todo` until the task in the "Un-todo task" column removes the markers; 
 | REQ-009 | `req-009-selectors-extractor.test.ts`: offers extracted as configured (alternate markup); `parsePrice` formats | T-003 | done |
 | REQ-013 | `req-013-dry-run-single-watch.test.ts`: dry run prints, no notify/state/history writes (fresh and existing state); `--watch <id>` fetches only that watch | T-009 | done |
 | REQ-010 | `rose.test.ts` (fixtures `tests/fixtures/rose/`, served by the fake shop): offers/prices/list prices/sizes across 2 listing pages; yellow is not available (note only); real `rose-gravel` (AL excluded) and `rose-road` (no Shave: silent); empty result not broken; missing structure broken | T-011 | done |
-| REQ-011, REQ-012 | not in the harness; added by T-012, T-013 with trimmed real fixtures | T-012, T-013 | n/a |
+| REQ-011 | `canyon.test.ts` (fixtures `tests/fixtures/canyon/`, served by the fake shop; its own tiny server for redirects): endurance offers/prices/list prices/sizes via the colour pages of the one candidate; e-bike (`:ON`) never alerts; sold-out L/XL silent; real `canyon-grail` (category page, name filter, carousel tiles ignored); no discount: silent; empty result not broken; missing marker, counter != tiles, redirect to the parent category, product page redirect / without size list: broken; cookie banner (shadow root) answered with the necessary-only button | T-012 | done |
+| REQ-012 | not in the harness; added by T-013 with trimmed real fixtures | T-013 | n/a |
 
 Unit tests: `tests/unit/` (builders add per task). Currently one smoke test.

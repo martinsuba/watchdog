@@ -69,7 +69,9 @@ describe("dismissCookieBanner", () => {
   });
 
   test("does nothing and says so when there is no banner", async () => {
-    await page.setContent(`<button onclick="window.clicked.push('x')">Add to cart</button><script>window.clicked=[]</script>`);
+    await page.setContent(
+      `<button onclick="window.clicked.push('x')">Add to cart</button><script>window.clicked=[]</script>`,
+    );
     assert.equal(await dismissCookieBanner(page, 100), "none");
     assert.deepEqual(await clicked(), []);
   });

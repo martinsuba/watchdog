@@ -1,0 +1,15 @@
+id: canyon-grail
+name: Canyon Grail CF (XS/S)
+site: canyon
+urls:
+  # The whole Grail category, filtered by name below: Canyon answers a URL filter that matches nothing with the parent
+  # category (HTTP 200), which would look like a result.
+  - https://www.canyon.com/en-sk/gravel-bikes/race/grail/
+currency: EUR
+match:
+  nameIncludes: ["Grail CF"] # see note: the "CF SL" filter of the site shows the models named "Grail CF ..."
+  nameExcludes: [CFR, SLX, ":ON"] # the category also has Grail CF SLX and CFR models, which the "CF SL" filter does not show
+  maxPrice: 3000
+  minDiscountPct: 15
+  sizes: [XS, S]
+note: The site's "CF SL" frame filter lists "Grail CF 7" and "Grail CF 7 Speed" (no "CF SL" in the names), so the name filter is "Grail CF".

@@ -7,7 +7,8 @@ describe("extractor registry", () => {
   test("has exactly one extractor per site a watch file may name", () => {
     assert.deepEqual(Object.keys(EXTRACTORS).sort(), [...KNOWN_SITES].sort());
   });
-  test("rose and selectors are registered", () => {
+  test("rose, canyon and selectors are registered", () => {
+    assert.equal(typeof extractorFor("canyon"), "function");
     assert.equal(typeof extractorFor("rose"), "function");
     assert.equal(typeof extractorFor("selectors"), "function");
   });
