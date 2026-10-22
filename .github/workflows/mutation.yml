@@ -1,0 +1,27 @@
+name: mutation
+# Report only, NOT a required check. Runs on milestone PRs (branch chore/milestone-*) and by hand (workflow_dispatch).
+# The report is the run artifact "mutation-report". Mutation testing is too heavy for the 4 GB VPS.
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mutation:
+    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'chore/milestone-') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run mutation
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mutation-report
+          path: reports/mutation/
+          retention-days: 30

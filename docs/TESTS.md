@@ -17,6 +17,22 @@ CI (`.github/workflows/ci.yml`, job `ci`, required check) runs: `npm ci`, Playwr
 format check, typecheck, unit, acceptance. `acceptance-guard.yml` blocks PRs that touch `tests/acceptance/` or
 `.github/workflows/` without the `acceptance-change` label or a successful `test-review` status.
 
+## Mutation testing
+Report only, never a gate (ARCHITECTURE D-007). Stryker (`@stryker-mutator/core`, pinned devDependency) with the
+`command` test runner; config in `stryker.config.json`.
+
+- Run all: `npm run mutation` (about 800 mutants, estimated 20-25 min on 2 vCPUs; heavy, prefer CI).
+- Run a small subset locally: `npx stryker run --mutate src/price.ts` (about 2.5 min).
+- Mutated: `src/rules.ts`, `diff.ts`, `price.ts`, `sanitize.ts`, `state.ts`, `history.ts`, `message.ts`, `watches.ts`.
+  Not mutated: browser/CLI glue and extractors (covered by the acceptance tests).
+- Each mutant runs `npm run test:mutation`: a browser-free unit subset (no Playwright, no temp git repos):
+  `tests/unit/{rules,diff,price,sanitize,state,history,message,watches}.test.ts`. A mutant survives when all pass.
+- CI: `.github/workflows/mutation.yml` runs on `chore/milestone-*` PRs and `workflow_dispatch`, timeout 45 min, not a
+  required check. Artifact `mutation-report`: `mutation.json`, `mutation.html` (open in a browser; shows survivors per
+  line); the clear-text table with survivors is in the job log. Locally the files are in `reports/mutation/`.
+- Reading it: "Survived" mutants in alert/data code (rules, diff, state, history, message) point at missing assertions;
+  survivors in error message strings are usually noise. `thresholds.break` is null: the score never fails the job.
+
 ## Acceptance test design
 Acceptance tests drive the real CLI as a subprocess: `node src/cli.ts run --watches-dir <tmp> --data-dir <tmp> [flags]`.
 No imports of feature code, except the REQ-009 price parser case (`parsePrice` from `src/price.ts`).
