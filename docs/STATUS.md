@@ -1,11 +1,13 @@
 # Status: watchdog
 Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: – (M1 complete)
-Open PRs: milestone PR M1 (chore/milestone-M1)
+Current task: T-011 (in progress; M2 order T-011, T-012, T-013, T-014)
+Open PRs: –
 Blockers: –
-Next step: Martin merges the M1 milestone PR (#15) and says "go M2" (questions answered, see below)
+Next step: M2 task loop; then milestone PR for Martin. Mutation testing (Stryker, needs .github/workflows) is NOT in PLAN.md: needs a plan PR + Martin label, propose at M2 end or earlier.
 
-Done in M1: T-001 … T-010 (all; PLAN.md ticked in the milestone PR)
+Done in M1: T-001 … T-010 (all; merged as PR #15)
+Done in M2: –
+T-011 also covers (from M1 follow-ups): extractor registry/dispatcher in run.ts, stable offer ids (strip query/tracking params in selectors extractor).
 
 ## Follow-ups from reviews / milestone review (for M2)
 - M2 needs a site dispatcher: run.ts calls the selectors extractor directly (extractors/<site> registry with T-011).
@@ -48,3 +50,4 @@ Done in M1: T-001 … T-010 (all; PLAN.md ticked in the milestone PR)
 - 2026-10-20: T-009 merged (PR #13): --dry-run has no side effects (byte-identical data dir), --watch <id> (unknown/invalid id exits 2; disabled watch runs when named).
 - 2026-10-20: T-010 merged (PR #14, 1 fix round: quadratic regex in sanitizer replaced by linear scanner): text sanitizing, own-domain link rule, 3500-char cap; all 46 acceptance tests pass. M1 complete.
 - 2026-10-22: Martin answered the 5 M1 questions with the Lead's proposals (see "Answers"); approved mutation testing as an M2 task.
+- 2026-10-22: Martin merged M1 (PR #15), "go M2". Dispatcher + stable ids folded into T-011 (no PLAN change).
