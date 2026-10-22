@@ -223,6 +223,23 @@ interaction, no proxy, no stealth plugin.
 - **Recommendation: implement** the extractor (it works today, JSON-LD is stable and simple), keeping D-006's "broken:
   blocked" path with the structural check above, and accept it may break without notice. Not worth variant clicking in v1.
 
+#### AliExpress implementation (T-013, 2026-10-22)
+`src/extractors/aliexpress.ts`. `cookiesFor(site)` (extractors/index.ts) gives the browser session the SK/EUR `aep_usuc_f`
+cookie (`.aliexpress.com`) before the first load, so the region is pinned from the first request (`withPage(..., cookies)`).
+Flow: load the item URL, poll up to 12 s until a JSON-LD script or a challenge shows, then `parseItem` (pure): block
+markers -> broken "blocked"; final URL must have the requested origin and item id (a redirect to de./another item is
+broken "redirected"); Product JSON-LD price (plain decimal), currency must be EUR, availability (InStock-like true,
+OutOfStock-like false, anything else broken); the displayed price, when present, must equal the JSON-LD price. Offer id =
+item id, url without query. Only the default variant is read (decision 2026-10-22).
+- **Real block seen 2026-10-22** (two live loads from the VPS, SK cookie set): the page skeleton loads (SK flag, product
+  gallery) but the data call `acs.aliexpress.com/.../mtop.aliexpress.pdp.pc.query/1.0/_____tmd_____/punish?x5secdata=...` is
+  challenged and a "We need to check if you are a robot" reCAPTCHA dialog covers the page; no JSON-LD, no price element,
+  empty title. Block detection = challenge element (`baxia-dialog`, `#nc_*_wrapper`), title, the robot-check text, or any
+  frame on `/punish`/`_____tmd_____`/`x5secdata`. Without any of these, a page without Product JSON-LD is still broken
+  ("no Product data ... blocked or changed"). The block page was not saved as a fixture (283 KB of untrusted page); the
+  acceptance tests use synthetic block pages. So the watch may well be broken on most days; that is the accepted best effort.
+- Run time: ~10 s when blocked, ~10-15 s with data (one page load, no retry).
+
 ### Other services
 - Telegram: via `~/HAL/scripts/tg_send.sh`, usage `echo "text" | tg_send.sh`, plain text (no parse mode). Token managed
   by HAL, never read by watchdog.

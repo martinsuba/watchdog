@@ -1,0 +1,10 @@
+id: aliexpress-ent
+name: EliteWheels ENT 2.0 carbon wheels (AliExpress, SK price)
+site: aliexpress
+urls:
+  # Item id only, no tracking parameters. The extractor pins region Slovakia / EUR with AliExpress's own cookie.
+  - https://www.aliexpress.com/item/1005006902683405.html
+currency: EUR
+match:
+  maxPrice: 329.99 # i.e. below 330 EUR
+note: Best effort. Compares the price of the DEFAULT variant (50mm depth) shipped to Slovakia (371.95 EUR on 2026-10-20); a block page or another region is reported as broken.

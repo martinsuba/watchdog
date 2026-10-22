@@ -28,7 +28,7 @@ Acceptance tests use the synthetic pages in `tests/acceptance/pages/`; these fix
 ## aliexpress/
 Captured 2026-10-20 with `scripts/spike/aliexpress.ts` (Chromium en-US, desktop UA). Trimmed by `scripts/spike/aliexpress-trim.ts`
 to: title, Product JSON-LD, product title, price block, SKU selectors, quantity note, buy/cart buttons. No block/captcha page
-was seen in 3 loads, so there is none (not invented).
+was seen in these 3 loads. On 2026-10-22 a reCAPTCHA block page did appear (docs/ARCHITECTURE.md); it was not saved, the acceptance tests use synthetic block pages.
 | File | Origin | Content |
 | --- | --- | --- |
 | `product-sk-eur.html` | https://www.aliexpress.com/item/1005006902683405.html with cookie `aep_usuc_f=site=glo&c_tp=EUR&region=SK&b_locale=en_US` | English UI, price 371.95 EUR, InStock |
