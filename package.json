@@ -10,12 +10,14 @@
   "scripts": {
     "start": "node src/cli.ts",
     "lint": "eslint .",
-    "format:check": "prettier --check src tests .github package.json tsconfig.json eslint.config.js",
-    "format": "prettier --write src tests .github package.json tsconfig.json eslint.config.js",
+    "format:check": "prettier --check src tests .github stryker.config.json package.json tsconfig.json eslint.config.js",
+    "format": "prettier --write src tests .github stryker.config.json package.json tsconfig.json eslint.config.js",
     "typecheck": "tsc --noEmit",
     "test:unit": "node --test \"tests/unit/**/*.test.ts\"",
     "test:acceptance": "node --test --test-concurrency=2 \"tests/acceptance/*.test.ts\"",
-    "test": "npm run test:unit && npm run test:acceptance"
+    "test": "npm run test:unit && npm run test:acceptance",
+    "test:mutation": "node --test tests/unit/rules.test.ts tests/unit/diff.test.ts tests/unit/price.test.ts tests/unit/sanitize.test.ts tests/unit/state.test.ts tests/unit/history.test.ts tests/unit/message.test.ts tests/unit/watches.test.ts",
+    "mutation": "stryker run"
   },
   "dependencies": {
     "playwright": "^1.64.1",
@@ -24,6 +26,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@stryker-mutator/core": "10.0.0",
     "@types/node": "^24.19.2",
     "eslint": "^10.13.0",
     "prettier": "^3.9.10",
