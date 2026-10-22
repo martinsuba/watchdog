@@ -25,3 +25,4 @@ date | gate/phase | what Martin did | could an agent do it? (y/n + why)
 2026-10-22 | M2 gate | Merged milestone PR #20 | n – gate by design
 2026-10-22 | deploy/plan | "deploy, mutation before" → plan v3 (M3: T-015 mutation report), deploy after M3 | n – Martin's priority call
 2026-10-22 | framework | Correction: don't ask to switch models mid-session, it is not effective; Lead stays on Opus, lighter tasks to subagents on a lower model | y – Lead should have followed the 2026-10-19 decision (one model in the Lead session) instead of suggesting /model switches
+2026-10-22 | plan gate | Merged plan v3 PR #21, "go M3" | n – gate by design
