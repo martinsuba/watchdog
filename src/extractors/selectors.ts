@@ -2,6 +2,7 @@ import type { Page } from "playwright";
 import { ExtractError } from "../errors.ts";
 import { parsePrice } from "../price.ts";
 import { MAX_NAME, sanitizeText } from "../sanitize.ts";
+import type { ExtractContext } from "./index.ts";
 import type { Offer, Selectors, Size, Watch } from "../types.ts";
 
 /** Typed strings read from the page; the page is untrusted, so nothing else is taken from it. */
@@ -22,7 +23,26 @@ const slug = (s: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
-/** Pure: raw strings -> offers. Offer id derives from the link (without fragment). */
+const TRACKING_PARAM =
+  /^(utm_.*|gclid|dclid|fbclid|msclkid|yclid|gbraid|wbraid|mc_cid|mc_eid|_ga|_gl|ref|ref_.*|referrer|sid|sessionid|session_id|cid|trk|tracking.*)$/i;
+
+/**
+ * Stable offer id from a link: no fragment, tracking/session parameters dropped, remaining parameters sorted. A shop
+ * that adds per-visit tracking parameters must not make every offer "new" each day. Parameters that may identify the
+ * product (`?pid=7`) are kept. The URL shown to the user is not changed.
+ */
+export function stableId(u: URL): string {
+  const id = new URL(u.href);
+  id.hash = "";
+  const kept = [...id.searchParams]
+    .filter(([k]) => !TRACKING_PARAM.test(k))
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  id.search = "";
+  for (const [k, v] of kept) id.searchParams.append(k, v);
+  return id.href;
+}
+
+/** Pure: raw strings -> offers. Offer id derives from the link (see stableId). */
 export function buildOffers(raws: RawOffer[], watchCurrency: string, pageUrl: string): Offer[] {
   return raws.map((raw) => {
     const name = sanitizeText(raw.name, MAX_NAME);
@@ -34,7 +54,7 @@ export function buildOffers(raws: RawOffer[], watchCurrency: string, pageUrl: st
       const u = new URL(raw.link, pageUrl);
       u.hash = "";
       url = u.href;
-      id = u.href;
+      id = stableId(u);
     }
     const sizes = raw.sizes.map((s) => ({ label: sanitizeText(s.label, MAX_SIZE_LABEL), available: s.available }));
     const inStock = !raw.outOfStock && (sizes.length === 0 || sizes.some((s) => s.available));
@@ -51,7 +71,7 @@ export function buildOffers(raws: RawOffer[], watchCurrency: string, pageUrl: st
   });
 }
 
-export async function extract(page: Page, watch: Watch): Promise<Offer[]> {
+export async function extract(page: Page, watch: Watch, _ctx?: ExtractContext): Promise<Offer[]> {
   const selectors = watch.selectors;
   if (selectors === undefined) throw new ExtractError("selectors missing in watch");
   const pageUrl = page.url();
