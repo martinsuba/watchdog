@@ -117,6 +117,12 @@ scrolled during capture, so "tiles present without scrolling" is likely but not 
 - **Recommended approach**: DOM only (no JSON). Listing pages -> filter by name (include "Backroad", exclude "Backroad AL";
   "Backroad FF" is included by the same word) and price/discount -> product page per remaining candidate, click wanted sizes,
   read traffic lights. `sale-listing.html` / `sale-listing-empty.html` / `product-size-xs|s.html` are the fixtures.
+- **Implementation (T-011)** `src/extractors/rose.ts`, registered as `site: rose` in `src/extractors/index.ts`. Offer id = abstract
+  SKU. Only candidates (name/price/discount from the listing) get a product visit; only green counts as available, a size
+  with yellow only is listed in the offer `note` ("orderable with delivery in weeks"). A Usercentrics consent dialog
+  (open shadow root, buttons `#deny` "Reject" / `#accept` "Agree") showed up on the live product page in T-011 and
+  intercepts clicks: the extractor clicks Reject when present. Run time (VPS, default 3-6 s page delay): ~25 s per Rose
+  watch without candidates (2 listing pages), +~18 s per candidate product page (2 sizes).
 - Shave: not in the sale listing today (neither page; no "Shave" in the HTML), so the watch is a correctly structured empty result.
 
 ### canyon.com en-sk category pages (spike T-001, captured 2026-10-20)
@@ -158,6 +164,19 @@ Server-rendered Salesforce Commerce Cloud pages; no JSON blob needed.
   need zero product pages) -> product page for candidates (each colour of a candidate if size matters per colour).
   Unexplored: the `data-url` on size buttons (`.../Product-Variation?...&dwvar_<id>_pv_rahmengroesse=<size>`) probably returns
   JSON/HTML per variant and could save page loads.
+- **Implementation (T-012)** `src/extractors/canyon.ts` (+ `consent.ts`), registered as `site: canyon`. Offer id = model id from the
+  product url (no query). Live check 2026-10-22: the results header holds the counter (`.productFilters__countResults
+  .js-productCount`; a second `.js-productCount` in the filter list reads "6 items" and must not be used); tiles are selected
+  by `data-product-tile-context="grid"` + `data-pid` (the saved fixtures no longer nest them under the `<ul>`). Grid tiles must
+  equal the counter (else broken). Every page is checked against the requested one: a final url that is not a watch url
+  (path, plus any filter parameter) is broken ("redirected to ..."), likewise a product page whose url no longer ends in the
+  tile's model id. Candidates (name/price/discount from the listing) get one product page per colour (tile href + swatch
+  `data-pdp-url`, max 8); a size is available when any colour has it purchasable. Cookie banner (live: buttons "Allow all" /
+  "Only necessary"): `dismissCookieBanner` clicks a necessary-only/reject button if there is one, else "Allow all", nothing
+  else (role locators see open shadow roots); waits up to 1.5 s on the listing page, none on product pages. The Grail watch
+  loads the whole category `/gravel-bikes/race/grail/` (6 models on 2026-10-22) and filters by name: the site's "CF SL" filter
+  shows "Grail CF 7" / "Grail CF 7 Speed", so the names contain "Grail CF" but not "CF SL"; CF SLX and CFR are excluded by name.
+  Run time (VPS, default 3-6 s page delay): ~6 s per Canyon watch without candidates, +~18 s per candidate (3 colour pages).
 
 ### aliexpress.com item page (spike T-002, captured 2026-10-20)
 Probe: `scripts/spike/aliexpress.ts` (one load per run), trimmer `scripts/spike/aliexpress-trim.ts`. Fixtures:
@@ -203,6 +222,23 @@ interaction, no proxy, no stealth plugin.
   still the item (else broken: redirected/blocked). One load per day, no retries beyond one.
 - **Recommendation: implement** the extractor (it works today, JSON-LD is stable and simple), keeping D-006's "broken:
   blocked" path with the structural check above, and accept it may break without notice. Not worth variant clicking in v1.
+
+#### AliExpress implementation (T-013, 2026-10-22)
+`src/extractors/aliexpress.ts`. `cookiesFor(site)` (extractors/index.ts) gives the browser session the SK/EUR `aep_usuc_f`
+cookie (`.aliexpress.com`) before the first load, so the region is pinned from the first request (`withPage(..., cookies)`).
+Flow: load the item URL, poll up to 12 s until a JSON-LD script or a challenge shows, then `parseItem` (pure): block
+markers -> broken "blocked"; final URL must have the requested origin and item id (a redirect to de./another item is
+broken "redirected"); Product JSON-LD price (plain decimal), currency must be EUR, availability (InStock-like true,
+OutOfStock-like false, anything else broken); the displayed price, when present, must equal the JSON-LD price. Offer id =
+item id, url without query. Only the default variant is read (decision 2026-10-22).
+- **Real block seen 2026-10-22** (two live loads from the VPS, SK cookie set): the page skeleton loads (SK flag, product
+  gallery) but the data call `acs.aliexpress.com/.../mtop.aliexpress.pdp.pc.query/1.0/_____tmd_____/punish?x5secdata=...` is
+  challenged and a "We need to check if you are a robot" reCAPTCHA dialog covers the page; no JSON-LD, no price element,
+  empty title. Block detection = challenge element (`baxia-dialog`, `#nc_*_wrapper`), title, the robot-check text, or any
+  frame on `/punish`/`_____tmd_____`/`x5secdata`. Without any of these, a page without Product JSON-LD is still broken
+  ("no Product data ... blocked or changed"). The block page was not saved as a fixture (283 KB of untrusted page); the
+  acceptance tests use synthetic block pages. So the watch may well be broken on most days; that is the accepted best effort.
+- Run time: ~10 s when blocked, ~10-15 s with data (one page load, no retry).
 
 ### Other services
 - Telegram: via `~/HAL/scripts/tg_send.sh`, usage `echo "text" | tg_send.sh`, plain text (no parse mode). Token managed

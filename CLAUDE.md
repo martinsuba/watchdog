@@ -5,7 +5,7 @@ State: docs/STATUS.md (read it first). Plan: docs/PRD.md, docs/ARCHITECTURE.md, 
 ## Stack
 Node 24 + TypeScript (native type stripping, no build step; erasable syntax only), Playwright (Chromium), yaml + zod,
 node:test. No DB: gitignored `data/` (state.json, history.csv, broken/ snapshots, logs). Runs daily via cron on agent-vps.
-Watch definitions: `watches/*.yaml` (public). Repair/new watch guide: docs/REPAIR.md (from T-014).
+Watch definitions: `watches/*.yaml` (public). Repair/new watch/new site guide: docs/REPAIR.md. Daily wrapper: scripts/cron-run.sh (docs/DEPLOY.md).
 
 ## Commands
 - Install: `npm ci` and `npx playwright install --with-deps chromium` (Chromium is already cached on agent-vps)

@@ -3,7 +3,7 @@ import { BrowserSession } from "./browser.ts";
 import type { BrowserOptions } from "./browser.ts";
 import { diff } from "./diff.ts";
 import { ExtractError } from "./errors.ts";
-import { extract } from "./extractors/selectors.ts";
+import { cookiesFor, extractorFor } from "./extractors/index.ts";
 import { appendHistory, pruneHistory } from "./history.ts";
 import type { HistoryRow } from "./history.ts";
 import { alertInvalid } from "./invalid.ts";
@@ -143,13 +143,16 @@ async function fetchOffers(session: BrowserSession, watch: Watch, snapshotDir: s
     const found = await session.withPage(
       url,
       async (page) => {
-        const list = await extract(page, watch);
+        const list = await extractorFor(watch.site)(page, watch, {
+          visit: (next, fn) => session.withPage(next, fn, snapshotDir, cookiesFor(watch.site)),
+        });
         const bad = list.find((o) => matches(o, watch.match, watch.currency).currencyMismatch);
         if (bad !== undefined)
           throw new ExtractError(`unexpected currency ${bad.currency} (expected ${watch.currency})`);
         return list;
       },
       snapshotDir,
+      cookiesFor(watch.site),
     );
     offers.push(...found);
   }

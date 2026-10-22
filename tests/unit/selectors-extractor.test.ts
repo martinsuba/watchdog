@@ -56,3 +56,19 @@ describe("buildOffers", () => {
     assert.deepEqual(o?.sizes, [{ label: "S", available: true }]);
   });
 });
+
+describe("buildOffers: stable ids", () => {
+  const idOf = (link: string) => buildOffers([{ ...base, link }], "EUR", "http://s/list")[0];
+  test("tracking parameters do not change the id (a shop adding utm_* per visit must not make every offer new)", () => {
+    const a = idOf("http://s/p/1?utm_source=mail&utm_campaign=x&gclid=abc&fbclid=1&ref=home");
+    assert.equal(a?.id, "http://s/p/1");
+    assert.equal(a?.id, idOf("http://s/p/1?utm_source=other")?.id);
+  });
+  test("parameters that identify the product are kept, in sorted order, next to dropped tracking ones", () => {
+    assert.equal(idOf("http://s/p?pid=7&utm_medium=x&color=red")?.id, "http://s/p?color=red&pid=7");
+    assert.equal(idOf("http://s/p?color=red&pid=7")?.id, "http://s/p?color=red&pid=7");
+  });
+  test("the url shown to the user keeps its query string", () => {
+    assert.equal(idOf("http://s/p/1?utm_source=mail&size=S")?.url, "http://s/p/1?utm_source=mail&size=S");
+  });
+});

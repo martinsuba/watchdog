@@ -9,16 +9,19 @@ function discountPct(price: number, listPrice?: number): number | null {
 }
 
 const MAX_SIZES_LINE = 300;
+const MAX_NOTE = 200;
 
 function renderAlert({ reasons, offer, matchingSizes }: Alert, watchUrls: string[]): string {
   const pct = discountPct(offer.price, offer.listPrice);
   const list = pct === null ? "" : ` (list ${offer.listPrice} ${offer.currency}, -${pct}%)`;
   const sizes = matchingSizes.map((x) => sanitizeText(x, 40)).filter((x) => x !== "");
   const sizesText = sizes.length ? `, sizes: ${sizes.join(", ")}` : "";
+  const note = offer.note === undefined ? "" : sanitizeText(offer.note, MAX_NOTE);
   return [
     "",
     `[${reasons.join(" + ")}] ${sanitizeText(offer.name, MAX_NAME)}`,
     `${offer.price} ${sanitizeText(offer.currency, 8)}${list}${sanitizeText(sizesText, MAX_SIZES_LINE)}`,
+    ...(note === "" ? [] : [`Note: ${note}`]),
     safeUrl(offer.url, watchUrls),
   ].join("\n");
 }

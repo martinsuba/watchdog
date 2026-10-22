@@ -11,6 +11,9 @@ const SNAPSHOT_STEP_MS = 5_000;
 const USER_AGENT =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 
+/** A cookie to pre-set in the browser context (e.g. a region/currency pin), as Playwright's addCookies takes it. */
+export type CookieSpec = Parameters<BrowserContext["addCookies"]>[0][number];
+
 export type BrowserOptions = { timeoutMs: number; delayMs: () => number };
 
 /** Defaults: 45 s per page, random 3-6 s between pages; overridable for tests via env (see cli.ts). */
@@ -68,13 +71,20 @@ export class BrowserSession {
 
   /**
    * Opens `url` and runs `fn`. A load failure (timeout, HTTP >= 400, network) throws ExtractError with a short reason.
+   * `cookies` are added to the context before the page is opened (same name/domain/path replaces).
    * When anything fails and `snapshotDir` is given, HTML + screenshot are saved there (pruned to the last few).
    */
-  async withPage<T>(url: string, fn: (page: Page) => Promise<T>, snapshotDir?: string): Promise<T> {
+  async withPage<T>(
+    url: string,
+    fn: (page: Page) => Promise<T>,
+    snapshotDir?: string,
+    cookies: CookieSpec[] = [],
+  ): Promise<T> {
     if (this.context === null) {
       this.browser = await chromium.launch({ headless: true });
       this.context = await this.browser.newContext({ userAgent: USER_AGENT, locale: "en-GB" });
     }
+    if (cookies.length > 0) await this.context.addCookies(cookies);
     if (this.opened++ > 0) await new Promise((r) => setTimeout(r, this.options.delayMs()));
     const page = await this.context.newPage();
     try {
