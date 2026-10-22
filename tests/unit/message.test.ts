@@ -27,6 +27,16 @@ describe("renderMessage", () => {
     assert.match(msg, /2800/);
     assert.match(msg, /http:\/\/x\/First/);
   });
+  test("an offer note is shown under the offer, sanitized", () => {
+    const a = alert("Noted");
+    a.offer = { ...a.offer, note: "orderable with delivery in weeks: XS <b>x</b>" } as typeof a.offer;
+    const msg = renderMessage("W", [a], WATCH);
+    assert.match(msg, /\nNote: orderable with delivery in weeks: XS/);
+    assert.doesNotMatch(msg, /<b>/);
+  });
+  test("an offer without a note has no Note line", () => {
+    assert.doesNotMatch(renderMessage("W", [alert("Plain")], WATCH), /Note:/);
+  });
 });
 
 describe("renderMessage details", () => {

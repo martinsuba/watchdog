@@ -9,6 +9,8 @@ export type Offer = {
   currency: string;
   sizes: Size[];
   inStock: boolean;
+  /** Short sanitized remark shown in alerts (Rose: sizes orderable with weeks of delivery, not counted as available). */
+  note?: string;
 };
 
 export type Match = {

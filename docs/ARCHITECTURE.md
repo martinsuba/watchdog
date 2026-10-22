@@ -117,6 +117,12 @@ scrolled during capture, so "tiles present without scrolling" is likely but not 
 - **Recommended approach**: DOM only (no JSON). Listing pages -> filter by name (include "Backroad", exclude "Backroad AL";
   "Backroad FF" is included by the same word) and price/discount -> product page per remaining candidate, click wanted sizes,
   read traffic lights. `sale-listing.html` / `sale-listing-empty.html` / `product-size-xs|s.html` are the fixtures.
+- **Implementation (T-011)** `src/extractors/rose.ts`, registered as `site: rose` in `src/extractors/index.ts`. Offer id = abstract
+  SKU. Only candidates (name/price/discount from the listing) get a product visit; only green counts as available, a size
+  with yellow only is listed in the offer `note` ("orderable with delivery in weeks"). A Usercentrics consent dialog
+  (open shadow root, buttons `#deny` "Reject" / `#accept` "Agree") showed up on the live product page in T-011 and
+  intercepts clicks: the extractor clicks Reject when present. Run time (VPS, default 3-6 s page delay): ~25 s per Rose
+  watch without candidates (2 listing pages), +~18 s per candidate product page (2 sizes).
 - Shave: not in the sale listing today (neither page; no "Shave" in the HTML), so the watch is a correctly structured empty result.
 
 ### canyon.com en-sk category pages (spike T-001, captured 2026-10-20)

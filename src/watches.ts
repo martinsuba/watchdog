@@ -5,7 +5,7 @@ import { parse } from "yaml";
 import { z } from "zod";
 import type { Watch } from "./types.ts";
 
-export const KNOWN_SITES = ["selectors"] as const;
+export const KNOWN_SITES = ["selectors", "rose"] as const;
 
 const selectorsSchema = z.object({
   pageMarker: z.string().min(1),
