@@ -124,5 +124,30 @@ because their fixtures come from the spikes.
 - Acceptance tests to make pass: none new; `scripts/cron-run.sh` covered by a unit/smoke test with a temp git repo.
 - Definition of done: docs reviewed, script tested, CI green.
 
+## M3: Mutation testing report (before the first deploy)
+Added by plan v3 (2026-10-22, Martin: "mutation before" deploy). Report only, never a gate (framework "Test depth").
+
+### [ ] T-015: Stryker mutation report on milestone PRs  (size M)
+- Goal: a mutation score and the list of surviving mutants for the code that decides alerts and writes user data, so
+  weak unit tests become visible before the first deploy.
+- REQs: supports REQ-003, REQ-004, REQ-005, REQ-006, REQ-008 (test quality, no behaviour change); ARCHITECTURE D-007.
+- Acceptance tests to make pass: none new; no change under `tests/acceptance/`.
+- Areas/files: `.github/workflows/mutation.yml` (**this task may add it**: from ~/.claude/framework/templates/mutation.yml,
+  plus `workflow_dispatch`; not a required check), `stryker.config.json` (or `.mjs`), `package.json`
+  (`@stryker-mutator/core` pinned as devDependency instead of `npx --yes`, script `test:mutation`), `.gitignore`
+  (`reports/`, `.stryker-tmp/`), docs/TESTS.md (how to run, what is mutated, how to read the report).
+- Scope of `mutate`: the pure engine modules `src/rules.ts`, `src/diff.ts`, `src/price.ts`, `src/sanitize.ts`,
+  `src/state.ts`, `src/history.ts`, `src/message.ts`, `src/watches.ts` (and the pure helpers of the extractors only if the
+  time budget allows). Not mutated: browser/CLI glue and the Playwright parts of extractors (covered by acceptance tests).
+- Test command: Stryker's `command` runner on a fast unit subset (no browser) via `npm run test:mutation`; the CI job must
+  finish within its 45-minute timeout. If Stryker cannot run the native-TS sources (type stripping) or the budget is not
+  met, narrow `mutate`, say exactly what was dropped and why in the PR; do not change production code to suit the tool.
+- Definition of done: `npm run test:mutation` works locally on a small `mutate` subset (show the output); workflow
+  validated (actionlint or a dry YAML check), runs on `chore/milestone-*` PRs and by `workflow_dispatch`, uploads the
+  `mutation-report` artifact (JSON + clear-text); CI green; review clean; test-review + Martin's `acceptance-change`
+  label (workflow change).
+- After merge (Lead): run the workflow by `workflow_dispatch` on main, download the report, put the score and the
+  survivors in REQ-critical code into the M3 milestone PR; survivors worth fixing become proposed tasks (plan PR).
+
 ## Screens (web UI projects)
 - none (CLI + Telegram messages only)
