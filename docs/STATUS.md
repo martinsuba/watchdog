@@ -1,12 +1,12 @@
 # Status: watchdog
 Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: T-012 (in progress; T-011 merged as PR #16; M2 order T-011, T-012, T-013, T-014)
+Current task: T-013 (in progress; T-011 PR #16, T-012 PR #17 merged; M2 order T-011, T-012, T-013, T-014)
 Open PRs: –
 Blockers: –
 Next step: M2 task loop; then milestone PR for Martin. Mutation testing (Stryker, needs .github/workflows) is NOT in PLAN.md: needs a plan PR + Martin label, propose at M2 end or earlier.
 
 Done in M1: T-001 … T-010 (all; merged as PR #15)
-Done in M2: T-011
+Done in M2: T-011, T-012
 T-011 also covers (from M1 follow-ups): extractor registry/dispatcher in run.ts, stable offer ids (strip query/tracking params in selectors extractor).
 
 ## Follow-ups from reviews / milestone review (for M2)
@@ -53,3 +53,4 @@ T-011 also covers (from M1 follow-ups): extractor registry/dispatcher in run.ts,
 - 2026-10-22: Martin merged M1 (PR #15), "go M2". Dispatcher + stable ids folded into T-011 (no PLAN change).
 - 2026-10-22: T-011 PR #16 ready, not merged by Lead: builder listed "questionable" items (merge condition e). Follow-ups: shadow-root consent dialog acceptance test; fixed 2 s settle per size; id params by name only; listing completeness only structural.
 - 2026-10-22: T-011 merged (PR #16, 0 fix rounds). Martin: "merge it and avoid these later" = builder-listed known limitations no longer block the Lead's merge when CI + reviewer + test-reviewer are green; limitations go to follow-ups.
+- 2026-10-22: T-012 merged (PR #17, 0 fix rounds). Grail watch uses nameIncludes "Grail CF" (site "CF SL" filter lists "Grail CF 7"; names never contain "CF SL"); reviewers agreed with PRD intent. Follow-ups: model rename silently matches nothing; no test for CFR/SLX exclusion, maxPrice boundaries, XS-only; redirect check accepts any of a watch's URLs (single-URL watches today).
