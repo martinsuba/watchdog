@@ -1,0 +1,12 @@
+id: rose-road
+name: Rose Shave (L/XL)
+site: rose
+urls:
+  - https://www.rosebikes.com/sale/bikes?sf=1
+currency: EUR
+match:
+  nameIncludes: [Shave]
+  maxPrice: 4500
+  minDiscountPct: 15
+  sizes: [L, XL, "58", "59"]
+note: Appears when a Shave enters the sale; until then an empty result is normal, not broken.

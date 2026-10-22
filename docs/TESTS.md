@@ -80,6 +80,7 @@ Status: `todo` until the task in the "Un-todo task" column removes the markers; 
 | REQ-008 | `req-008-untrusted-pages.test.ts`: hostile name stripped and capped at 120; foreign/`javascript:` link replaced by watch URL per offer; 3500-char message cap | T-010 | done |
 | REQ-009 | `req-009-selectors-extractor.test.ts`: offers extracted as configured (alternate markup); `parsePrice` formats | T-003 | done |
 | REQ-013 | `req-013-dry-run-single-watch.test.ts`: dry run prints, no notify/state/history writes (fresh and existing state); `--watch <id>` fetches only that watch | T-009 | done |
-| REQ-010, REQ-011, REQ-012 | not in the harness; added by T-011, T-012, T-013 with trimmed real fixtures | T-011 to T-013 | n/a |
+| REQ-010 | `rose.test.ts` (fixtures `tests/fixtures/rose/`, served by the fake shop): offers/prices/list prices/sizes across 2 listing pages; yellow is not available (note only); real `rose-gravel` (AL excluded) and `rose-road` (no Shave: silent); empty result not broken; missing structure broken | T-011 | done |
+| REQ-011, REQ-012 | not in the harness; added by T-012, T-013 with trimmed real fixtures | T-012, T-013 | n/a |
 
 Unit tests: `tests/unit/` (builders add per task). Currently one smoke test.

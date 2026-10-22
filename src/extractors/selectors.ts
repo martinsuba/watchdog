@@ -2,7 +2,6 @@ import type { Page } from "playwright";
 import { ExtractError } from "../errors.ts";
 import { parsePrice } from "../price.ts";
 import { MAX_NAME, sanitizeText } from "../sanitize.ts";
-import type { ExtractContext } from "./index.ts";
 import type { Offer, Selectors, Size, Watch } from "../types.ts";
 
 /** Typed strings read from the page; the page is untrusted, so nothing else is taken from it. */
@@ -71,7 +70,7 @@ export function buildOffers(raws: RawOffer[], watchCurrency: string, pageUrl: st
   });
 }
 
-export async function extract(page: Page, watch: Watch, _ctx?: ExtractContext): Promise<Offer[]> {
+export async function extract(page: Page, watch: Watch): Promise<Offer[]> {
   const selectors = watch.selectors;
   if (selectors === undefined) throw new ExtractError("selectors missing in watch");
   const pageUrl = page.url();

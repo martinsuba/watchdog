@@ -109,3 +109,13 @@ describe("loadWatches", () => {
     );
   });
 });
+
+describe("the watch files shipped in watches/", () => {
+  test("all load without errors and use a known site", () => {
+    const { watches, invalid } = loadWatches(new URL("../../watches/", import.meta.url).pathname);
+    assert.deepEqual(invalid, []);
+    const sites = Object.fromEntries(watches.map((w) => [w.id, w.site]));
+    assert.equal(sites["rose-gravel"], "rose");
+    assert.equal(sites["rose-road"], "rose");
+  });
+});

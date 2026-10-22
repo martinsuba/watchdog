@@ -1,0 +1,13 @@
+id: rose-gravel
+name: Rose Backroad (XS/S)
+site: rose
+urls:
+  - https://www.rosebikes.com/sale/bikes?sf=1
+currency: EUR
+match:
+  nameIncludes: [Backroad] # also matches Backroad FF
+  nameExcludes: [Backroad AL]
+  maxPrice: 3000
+  minDiscountPct: 15
+  sizes: [XS, S, "50", "53"]
+note: Only a green traffic light (in stock) counts as available; yellow (delivery in weeks) is only a note.
