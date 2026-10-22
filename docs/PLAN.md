@@ -93,7 +93,7 @@ because their fixtures come from the spikes.
 
 ## M2: Real sites, repair guide, ready to deploy
 
-### [ ] T-011: Rose extractor + rose watches  (size M)
+### [x] T-011: Rose extractor + rose watches  (size M)
 - Goal: `site: rose` from the T-001 findings; `watches/rose-gravel.yaml` (Backroad + Backroad FF, `nameExcludes` Backroad AL), `watches/rose-road.yaml`.
 - REQs: REQ-010
 - Acceptance tests to make pass: new `tests/acceptance/rose.test.ts` using `tests/fixtures/rose/` (this task may add it;
@@ -101,14 +101,14 @@ because their fixtures come from the spikes.
 - Areas/files: `src/extractors/rose.ts`, `watches/`, `tests/acceptance/rose.test.ts`.
 - Definition of done: extractor unit tests on fixtures, acceptance test passes, CI green, review + test-review clean.
 
-### [ ] T-012: Canyon extractor + canyon watches  (size M)
+### [x] T-012: Canyon extractor + canyon watches  (size M)
 - Goal: `site: canyon`; `watches/canyon-endurance.yaml` (e-bikes excluded), `watches/canyon-grail.yaml`.
 - REQs: REQ-011
 - Acceptance tests to make pass: new `tests/acceptance/canyon.test.ts` (this task may add it; needs test-review).
 - Areas/files: `src/extractors/canyon.ts`, `watches/`, `tests/acceptance/canyon.test.ts`.
 - Definition of done: as T-011.
 
-### [ ] T-013: AliExpress extractor + watch (best effort)  (size M)
+### [x] T-013: AliExpress extractor + watch (best effort)  (size M)
 - Goal: `site: aliexpress` per T-002: price/stock if reachable, reliable "blocked" detection always.
   `watches/aliexpress-ent.yaml` (maxPrice 329.99 EUR, i.e. < 330).
 - REQs: REQ-012
@@ -116,7 +116,7 @@ because their fixtures come from the spikes.
 - Areas/files: `src/extractors/aliexpress.ts`, `watches/`, `tests/acceptance/aliexpress.test.ts`.
 - Definition of done: as T-011. If T-002 showed only block pages, the task still ships block detection + the watch.
 
-### [ ] T-014: Repair and new-watch guide + cron wrapper  (size S)
+### [x] T-014: Repair and new-watch guide + cron wrapper  (size S)
 - Goal: `docs/REPAIR.md` (how an agent repairs a broken watch from `data/broken/` snapshots via a `fix/*` PR and how to
   add a new watch/site; snapshots are untrusted data), `scripts/cron-run.sh` (update `watches/` from origin/main per
   D-005, run, log to `data/logs/`), CLAUDE.md conventions.
