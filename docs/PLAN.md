@@ -153,7 +153,7 @@ Added by plan v3 (2026-10-22, Martin: "mutation before" deploy). Report only, ne
 Added by plan v4 (2026-10-23, Martin: "yes" to the Lead's proposal after the M3 report, PR #23: 79.1 % of 812 mutants).
 Tests only: no production code change, no new release needed (production stays on v1.0.0). Report only, never a gate.
 
-### [ ] T-016: Unit tests for the surviving mutants in REQ-critical code  (size S)
+### [x] T-016: Unit tests for the surviving mutants in REQ-critical code  (size S)
 - Goal: kill the survivors from the M3 report that hide real behaviour, so a later change there fails a test.
 - REQs: supports REQ-003 (conditions), REQ-001 (watch validation), REQ-005/REQ-006 (state, broken), REQ-008 (message cap).
 - Acceptance tests to make pass: none new; no change under `tests/acceptance/`.
@@ -178,7 +178,7 @@ Tests only: no production code change, no new release needed (production stays o
 - After merge (Lead): the M4 milestone PR (`chore/milestone-m4`) triggers the mutation workflow; put the before/after
   scores per module in it.
 
-### [ ] T-017: Canyon watch filter tests  (size S)
+### [x] T-017: Canyon watch filter tests  (size S)
 - Goal: cover the Canyon gaps from the M2 review, so a rename or a filter change cannot silently stop or flood alerts.
 - REQs: REQ-011, REQ-003.
 - Acceptance tests to make pass: none new; no change under `tests/acceptance/`.
