@@ -1,12 +1,13 @@
 # Status: watchdog
 Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: T-017 in progress (M4); T-016 merged (PR #27)
-Open PRs: T-017
+Current task: – (M4 done: T-016, T-017 merged; milestone review)
+Open PRs: Milestone M4 (chore/milestone-m4)
 Blockers: –
-Next step: Martin merges Plan v4 → "go M4" → T-016, T-017 → M4 milestone PR with before/after mutation scores; retro.
+Next step: mutation workflow on the M4 PR → before/after scores into the PR body; Martin merges M4; retro.
 
 Done in M1: T-001 … T-010 (all; merged as PR #15)
 Done in M2: T-011, T-012, T-013, T-014
+Done in M4: T-016 (PR #27), T-017 (PR #28)
 Done in M3: T-015 (milestone PR #23 merged 2026-10-23; mutation score 79.1%, no code bugs, test gaps → T-016)
 T-011 also covers (from M1 follow-ups): extractor registry/dispatcher in run.ts, stable offer ids (strip query/tracking params in selectors extractor).
 
@@ -66,3 +67,5 @@ T-011 also covers (from M1 follow-ups): extractor registry/dispatcher in run.ts,
 - 2026-10-23: Martin confirmed the Telegram test message and the cron line at 08:15 (not 08:00: HAL weekly.sh runs Mondays 08:00). Cron installed (only this line added). v1.0.0 deployed to ~/apps/watchdog.
 - 2026-10-23: First scheduled run 08:15 OK: exit 0, 71 s, watches/ updated from origin/main (2ff61a5); history.csv 60 rows (rose 21+21, canyon-endurance 11, canyon-grail 6, aliexpress-ent 1 broken); 0 matches; only aliexpress-ent broken "blocked" (snapshot saved). Deploy record PR #24 merged by Martin.
 - 2026-10-23: Martin confirmed "yes" to plan v4 (M4: T-016 unit tests for mutation survivors; T-017 Canyon filter tests from M2 follow-ups). Tests only, no release.
+- 2026-10-23: T-016 merged (PR #27, 0 fix rounds): unit tests for M3 survivors; reviewer killed 10/11 hand mutations, the 11th (message.ts "first alert always shown" guard) is equivalent (single alert ≤ ~1.4k chars). Follow-ups: bound the "fit exactly" loop in message.test.ts (hangs instead of failing under one mutation); rename/comment the equivalent-branch test.
+- 2026-10-23: T-017 merged (PR #28, 1 fix round: ":ON" exclude was not isolated → added "Grail CF:ON 8"). Canyon watch tests use real loader, rules and fixture parser. Main CI took 7m54s (vs ~2.5 min): watch.
