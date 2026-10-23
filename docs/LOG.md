@@ -35,3 +35,4 @@ date | gate/phase | what Martin did | could an agent do it? (y/n + why)
 2026-10-23 | M4 gate | "go m4" | n – milestone start by design
 2026-10-23 | M4 gate | Merged milestone PR #29 | n – gate by design
 2026-10-23 | M4 | Asked what mutations are | y – plan PR should explain new tools in plain words (RETRO P4)
+2026-10-23 | after retro | Asked if it works and about AliExpress; "done for now" | n – status question; answer could be in the retro/deploy summary

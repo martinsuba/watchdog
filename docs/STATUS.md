@@ -3,7 +3,7 @@ Phase: deploy   <!-- planning | plan review | harness | harness review | build |
 Current task: – (v1.0.0 in production; M4 merged (PR #29), mutation 83.7 %; retro written)
 Open PRs: Retro (chore/retro)
 Blockers: –
-Next step: Martin merges the retro PR and takes its framework proposals to the ops session; daily runs continue (check on request).
+Next step: paused by Martin ("done for now", 2026-10-23). Open ideas if he returns: weekly heartbeat / no-run alert (plan PR); AliExpress blocked from the VPS (options: run from home machine, paid proxy, or accept/drop; Lead recommends accept).
 
 Done in M1: T-001 … T-010 (all; merged as PR #15)
 Done in M2: T-011, T-012, T-013, T-014
