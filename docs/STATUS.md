@@ -1,9 +1,9 @@
 # Status: watchdog
 Phase: deploy   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: – (v1.0.0 deployed 2026-10-23; first scheduled run 08:15 pending check)
-Open PRs: deploy record (chore/deploy-v1.0.0)
+Current task: – (v1.0.0 in production; first scheduled run 2026-10-23 08:15 OK)
+Open PRs: first-run record (chore/first-run-check)
 Blockers: –
-Next step: check first scheduled run (data/logs, history.csv, exactly one Telegram message: aliexpress-ent broken); plan v4 with T-016 (mutation test gaps); retro.
+Next step: Martin confirms exactly one Telegram message today (aliexpress-ent broken: blocked); plan v4 with T-016 (mutation test gaps); retro.
 
 Done in M1: T-001 … T-010 (all; merged as PR #15)
 Done in M2: T-011, T-012, T-013, T-014
@@ -64,3 +64,4 @@ T-011 also covers (from M1 follow-ups): extractor registry/dispatcher in run.ts,
 - 2026-10-22: Martin: "label 22" → Lead added acceptance-change; T-015 merged (PR #22, 0 fix rounds).
 - 2026-10-23: Martin merged M3 (PR #23), "deploy v1.0.0". Tag v1.0.0 on 2ff61a5 pushed. Staging (real sites): dry run exit 0, 63 s; local-notify run: rose 21+21, canyon-endurance 11, canyon-grail 6 offers, 0 matches, aliexpress broken "blocked". Telegram test message sent.
 - 2026-10-23: Martin confirmed the Telegram test message and the cron line at 08:15 (not 08:00: HAL weekly.sh runs Mondays 08:00). Cron installed (only this line added). v1.0.0 deployed to ~/apps/watchdog.
+- 2026-10-23: First scheduled run 08:15 OK: exit 0, 71 s, watches/ updated from origin/main (2ff61a5); history.csv 60 rows (rose 21+21, canyon-endurance 11, canyon-grail 6, aliexpress-ent 1 broken); 0 matches; only aliexpress-ent broken "blocked" (snapshot saved). Deploy record PR #24 merged by Martin.
