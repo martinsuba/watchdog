@@ -1,13 +1,13 @@
 # Status: watchdog
-Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: – (M3 task T-015 merged as PR #22; mutation report running on the M3 milestone PR)
-Open PRs: milestone PR M3 (chore/milestone-M3)
+Phase: deploy   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
+Current task: deploy v1.0.0 (tag on 2ff61a5) to ~/apps/watchdog: cloned, deps installed, staging dry run + local-notify run OK; Telegram test message sent, waiting for Martin to confirm; then cron line (Martin confirms)
+Open PRs: –
 Blockers: –
-Next step: mutation report into the M3 milestone PR; Martin merges it; then deploy v1.0.0 (approved: "deploy").
+Next step: Martin confirms test message + cron line; record deploy (this branch, PR); plan v4 with T-016 (mutation test gaps); retro.
 
 Done in M1: T-001 … T-010 (all; merged as PR #15)
 Done in M2: T-011, T-012, T-013, T-014
-Done in M3: T-015
+Done in M3: T-015 (milestone PR #23 merged 2026-10-23; mutation score 79.1%, no code bugs, test gaps → T-016)
 T-011 also covers (from M1 follow-ups): extractor registry/dispatcher in run.ts, stable offer ids (strip query/tracking params in selectors extractor).
 
 ## Follow-ups from reviews / milestone review (for M2)
@@ -62,3 +62,4 @@ T-011 also covers (from M1 follow-ups): extractor registry/dispatcher in run.ts,
 - 2026-10-22: Martin: the Lead session stays on Opus; do not ask him to switch models in this session (switching mid-session is not effective). Lighter work goes to subagents with an explicitly lower model (builder/reviewer/test-reviewer: sonnet). This overrides the framework's "Opus only for planning/milestone reviews" for this project.
 - 2026-10-22: Plan v3 merged (PR #21); Martin: "go M3".
 - 2026-10-22: Martin: "label 22" → Lead added acceptance-change; T-015 merged (PR #22, 0 fix rounds).
+- 2026-10-23: Martin merged M3 (PR #23), "deploy v1.0.0". Tag v1.0.0 on 2ff61a5 pushed. Staging (real sites): dry run exit 0, 63 s; local-notify run: rose 21+21, canyon-endurance 11, canyon-grail 6 offers, 0 matches, aliexpress broken "blocked". Telegram test message sent.
