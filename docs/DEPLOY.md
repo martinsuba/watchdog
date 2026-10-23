@@ -17,8 +17,8 @@ Only after Martin approves the deploy of a specific tag (`v<major>.<minor>.<patc
 4. Staging: `node src/cli.ts run --dry-run --data-dir ~/apps/watchdog-staging-data` → check output (smoke checks below).
 5. First time only: test message `echo "watchdog: test message" | ~/HAL/scripts/tg_send.sh` (Martin confirms it arrived).
 6. First time only: install the cron line (Lead proposes, Martin confirms):
-   `0 8 * * *  WATCHDOG_NOTIFY_CMD=$HOME/HAL/scripts/tg_send.sh $HOME/apps/watchdog/scripts/cron-run.sh`
-   (08:00 daily; avoids HAL's 03:00–05:30 sync/restart window).
+   `15 8 * * *  WATCHDOG_NOTIFY_CMD=$HOME/HAL/scripts/tg_send.sh $HOME/apps/watchdog/scripts/cron-run.sh`
+   (08:15 daily; avoids HAL's 03:00–05:30 sync/restart window and HAL's Monday 08:00 `weekly.sh`).
 7. Record the deploy in History below and in docs/STATUS.md.
 
 `scripts/cron-run.sh` (T-014): `git fetch origin`, replace `watches/` with `origin/main`'s copy (D-005), then
@@ -41,3 +41,4 @@ To stop entirely: comment out the cron line.
 - Env var `WATCHDOG_NOTIFY_CMD` (not secret), set in the cron line.
 
 ## History (date · commit · target · result)
+- 2026-10-23 · v1.0.0 (2ff61a5) · agent-vps `~/apps/watchdog`, cron 08:15 daily · OK: staging dry run exit 0 (63 s); local-notify staging run read rose 21+21, canyon-endurance 11, canyon-grail 6 offers, 0 matches, aliexpress-ent broken "blocked" (expected); Telegram test message confirmed by Martin; node/git/flock/timeout on cron's default PATH; first scheduled run 2026-10-23 08:15 (pending check).
