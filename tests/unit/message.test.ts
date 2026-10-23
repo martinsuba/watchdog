@@ -141,3 +141,65 @@ describe("other messages are capped and sanitized (REQ-008)", () => {
     assert.doesNotMatch(renderBroken("W", "a\u202E<b>x</b>\u0007"), BAD);
   });
 });
+
+describe("renderMessage: 3500 character cap", () => {
+  const many = (n: number) => Array.from({ length: n }, (_, i) => alert(`Offer${String(i).padStart(3, "0")}`));
+  const shownCount = (msg: string) => (msg.match(/^\[new\]/gm) ?? []).length;
+
+  test("many alerts: at most 3500 chars, ends with '… and N more' where N is the number not shown", () => {
+    const msg = renderMessage("W", many(100), WATCH);
+    assert.ok(msg.length <= 3500, String(msg.length));
+    const shown = shownCount(msg);
+    assert.ok(shown > 0 && shown < 100);
+    assert.match(msg, new RegExp(`\\n\\n… and ${100 - shown} more\\n$`));
+    assert.match(msg, /Offer000/);
+    assert.doesNotMatch(msg, new RegExp(`Offer${String(shown).padStart(3, "0")}`));
+  });
+  test("alerts that fit exactly give no 'more' line", () => {
+    // find the largest n that fits without a more line, then check n has none and n+1 has one
+    let n = 1;
+    while (!/more\n$/.test(renderMessage("W", many(n + 1), WATCH))) n++;
+    const fit = renderMessage("W", many(n), WATCH);
+    assert.doesNotMatch(fit, /… and \d+ more/);
+    assert.equal(shownCount(fit), n);
+    assert.ok(fit.length <= 3500);
+    const over = renderMessage("W", many(n + 1), WATCH);
+    assert.match(over, new RegExp(`… and ${n + 1 - shownCount(over)} more\\n$`));
+  });
+  test("alerts filling exactly 3500 chars are all shown; one more char moves the last alert to '… and 1 more'", () => {
+    let n = 2;
+    while (renderMessage("W", many(n), WATCH).length < 3300) n++;
+    const base = many(n);
+    const last = base[n - 1] as ReturnType<typeof alert>;
+    const withNote = (len: number) => {
+      const copy = [...base];
+      copy[n - 1] = { ...last, offer: { ...last.offer, note: "n".repeat(len) } as typeof last.offer };
+      return renderMessage("W", copy, WATCH);
+    };
+    const room = 3500 - renderMessage("W", base, WATCH).length - "\nNote: ".length;
+    assert.ok(room > 0 && room <= 200, String(room));
+    const exact = withNote(room);
+    assert.equal(exact.length, 3500);
+    assert.equal(shownCount(exact), n);
+    assert.doesNotMatch(exact, /… and \d+ more/);
+    const over = withNote(room + 1);
+    assert.ok(over.length <= 3500);
+    assert.equal(shownCount(over), n - 1);
+    assert.match(over, /\n\n… and 1 more\n$/);
+  });
+  test("a single alert is shown in full without a 'more' line", () => {
+    const msg = renderMessage("W", many(1), WATCH);
+    assert.equal(shownCount(msg), 1);
+    assert.doesNotMatch(msg, /more/);
+  });
+  test("the first alert is always shown, in full, even when it alone is long", () => {
+    const long = alert("Long");
+    long.offer = { ...long.offer, note: "n".repeat(200), url: `http://x/${"u".repeat(480)}` } as typeof long.offer;
+    long.matchingSizes = Array.from({ length: 60 }, (_, i) => `size-number-${i}`);
+    const msg = renderMessage("W", [long, ...many(100)], WATCH);
+    assert.match(msg, /^Watchdog: W\n\[new\] Long/);
+    assert.match(msg, /u{480}/);
+    assert.ok(msg.length <= 3500);
+    assert.match(msg, new RegExp(`… and ${101 - shownCount(msg)} more\\n$`));
+  });
+});

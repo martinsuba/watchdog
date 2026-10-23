@@ -119,3 +119,20 @@ describe("the watch files shipped in watches/", () => {
     assert.equal(sites["rose-road"], "rose");
   });
 });
+
+describe("watch id format", () => {
+  for (const id of ["rose-gravel!", "Rose", "a b", "a_b", "a.b"]) {
+    test(`id ${JSON.stringify(id)} is invalid`, () => {
+      withDir({ [`${id}.yaml`]: valid.replace("id: a", `id: ${JSON.stringify(id)}`) }, (dir) => {
+        const r = loadWatches(dir);
+        assert.equal(r.watches.length, 0);
+        assert.equal(r.invalid.length, 1);
+      });
+    });
+  }
+  test("a lowercase id with digits and dashes is valid", () => {
+    withDir({ "rose-3.yaml": valid.replace("id: a", "id: rose-3") }, (dir) => {
+      assert.equal(loadWatches(dir).watches.length, 1);
+    });
+  });
+});
