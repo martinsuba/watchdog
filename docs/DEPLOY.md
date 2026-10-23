@@ -41,4 +41,4 @@ To stop entirely: comment out the cron line.
 - Env var `WATCHDOG_NOTIFY_CMD` (not secret), set in the cron line.
 
 ## History (date · commit · target · result)
-- 2026-10-23 · v1.0.0 (2ff61a5) · agent-vps `~/apps/watchdog`, cron 08:15 daily · OK: staging dry run exit 0 (63 s); local-notify staging run read rose 21+21, canyon-endurance 11, canyon-grail 6 offers, 0 matches, aliexpress-ent broken "blocked" (expected); Telegram test message confirmed by Martin; node/git/flock/timeout on cron's default PATH; first scheduled run 2026-10-23 08:15 (pending check).
+- 2026-10-23 · v1.0.0 (2ff61a5) · agent-vps `~/apps/watchdog`, cron 08:15 daily · OK: staging dry run exit 0 (63 s); local-notify staging run read rose 21+21, canyon-endurance 11, canyon-grail 6 offers, 0 matches, aliexpress-ent broken "blocked" (expected); Telegram test message confirmed by Martin; node/git/flock/timeout on cron's default PATH; first scheduled run 2026-10-23 08:15 OK: exit 0 in 71 s, 60 history rows, 0 matches, only aliexpress-ent broken "blocked".
