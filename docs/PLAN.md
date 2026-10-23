@@ -127,7 +127,7 @@ because their fixtures come from the spikes.
 ## M3: Mutation testing report (before the first deploy)
 Added by plan v3 (2026-10-22, Martin: "mutation before" deploy). Report only, never a gate (framework "Test depth").
 
-### [ ] T-015: Stryker mutation report on milestone PRs  (size M)
+### [x] T-015: Stryker mutation report on milestone PRs  (size M)
 - Goal: a mutation score and the list of surviving mutants for the code that decides alerts and writes user data, so
   weak unit tests become visible before the first deploy.
 - REQs: supports REQ-003, REQ-004, REQ-005, REQ-006, REQ-008 (test quality, no behaviour change); ARCHITECTURE D-007.
