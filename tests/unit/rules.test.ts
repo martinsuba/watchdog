@@ -99,3 +99,45 @@ describe("matches", () => {
     });
   });
 });
+
+describe("matches: gaps", () => {
+  test("an offer containing only one of several exclude terms is excluded", () => {
+    const o = offer(1, { name: "Canyon Grail CF SL" });
+    assert.equal(matches(o, { nameExcludes: ["CFR", "SL"] }).matched, false);
+    assert.equal(matches(o, { nameExcludes: ["SL", "CFR"] }).matched, false);
+    assert.equal(matches(o, { nameExcludes: ["CFR", "SLX"] }).matched, true);
+  });
+  test("an in-stock offer without size data matches and has no matching sizes", () => {
+    const r = matches(offer(1, { sizes: [], inStock: true }), {});
+    assert.equal(r.matched, true);
+    assert.deepEqual(r.matchingSizes, []);
+  });
+  test("an offer without size data is not in stock when inStock is false", () => {
+    assert.equal(matches(offer(1, { sizes: [], inStock: false }), {}).matched, false);
+  });
+  test("a watch without sizes matches any available size", () => {
+    const o = offer(1, { sizes: [{ label: "XL", available: true }] });
+    assert.equal(matches(o, {}).matched, true);
+    assert.equal(matches(o, { sizes: [] }).matched, true);
+  });
+  test("a watch with sizes does not match an offer without size data", () => {
+    assert.equal(matches(offer(1, { sizes: [] }), { sizes: ["M"] }).matched, false);
+  });
+  test("a list price of 0 or below never satisfies minDiscountPct, even 0", () => {
+    for (const listPrice of [0, -100]) {
+      for (const minDiscountPct of [0, 15]) {
+        assert.equal(
+          matches(offer(50, { listPrice }), { minDiscountPct }).matched,
+          false,
+          `${listPrice}/${minDiscountPct}`,
+        );
+      }
+    }
+  });
+  test("a free offer with a list price of 0 never satisfies minDiscountPct 0", () => {
+    assert.equal(matches(offer(0, { listPrice: 0 }), { minDiscountPct: 0 }).matched, false);
+  });
+  test("a missing list price never satisfies minDiscountPct", () => {
+    assert.equal(matches(offer(50), { minDiscountPct: 0 }).matched, false);
+  });
+});

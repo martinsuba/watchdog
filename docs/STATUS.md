@@ -1,7 +1,7 @@
 # Status: watchdog
-Phase: plan review   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: – (plan v4: M4 = T-016 mutation gaps, T-017 Canyon filter tests; v1.0.0 in production)
-Open PRs: Plan v4 (plan/4)
+Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
+Current task: T-016 in progress (M4)
+Open PRs: T-016
 Blockers: –
 Next step: Martin merges Plan v4 → "go M4" → T-016, T-017 → M4 milestone PR with before/after mutation scores; retro.
 
