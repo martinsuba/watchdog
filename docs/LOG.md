@@ -33,3 +33,5 @@ date | gate/phase | what Martin did | could an agent do it? (y/n + why)
 2026-10-23 | deploy | "check the run" | n – routine check, Lead did it
 2026-10-23 | plan | "yes" to plan v4 (T-016 mutation gaps) | n – scope change needs Martin by design
 2026-10-23 | M4 gate | "go m4" | n – milestone start by design
+2026-10-23 | M4 gate | Merged milestone PR #29 | n – gate by design
+2026-10-23 | M4 | Asked what mutations are | y – plan PR should explain new tools in plain words (RETRO P4)

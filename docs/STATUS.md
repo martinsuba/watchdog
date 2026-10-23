@@ -1,9 +1,9 @@
 # Status: watchdog
-Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: – (M4 done: T-016, T-017 merged; milestone review)
-Open PRs: Milestone M4 (chore/milestone-m4)
+Phase: deploy   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
+Current task: – (v1.0.0 in production; M4 merged (PR #29), mutation 83.7 %; retro written)
+Open PRs: Retro (chore/retro)
 Blockers: –
-Next step: mutation workflow on the M4 PR → before/after scores into the PR body; Martin merges M4; retro.
+Next step: Martin merges the retro PR and takes its framework proposals to the ops session; daily runs continue (check on request).
 
 Done in M1: T-001 … T-010 (all; merged as PR #15)
 Done in M2: T-011, T-012, T-013, T-014
@@ -69,3 +69,4 @@ T-011 also covers (from M1 follow-ups): extractor registry/dispatcher in run.ts,
 - 2026-10-23: Martin confirmed "yes" to plan v4 (M4: T-016 unit tests for mutation survivors; T-017 Canyon filter tests from M2 follow-ups). Tests only, no release.
 - 2026-10-23: T-016 merged (PR #27, 0 fix rounds): unit tests for M3 survivors; reviewer killed 10/11 hand mutations, the 11th (message.ts "first alert always shown" guard) is equivalent (single alert ≤ ~1.4k chars). Follow-ups: bound the "fit exactly" loop in message.test.ts (hangs instead of failing under one mutation); rename/comment the equivalent-branch test.
 - 2026-10-23: T-017 merged (PR #28, 1 fix round: ":ON" exclude was not isolated → added "Grail CF:ON 8"). Canyon watch tests use real loader, rules and fixture parser. Main CI took 7m54s (vs ~2.5 min): watch.
+- 2026-10-23: Martin merged M4 (PR #29); mutation 79.1 % → 83.7 %. Retro written (docs/RETRO.md).
