@@ -1,9 +1,9 @@
 # Status: watchdog
 Phase: deploy   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: deploy v1.0.0 (tag on 2ff61a5) to ~/apps/watchdog: cloned, deps installed, staging dry run + local-notify run OK; Telegram test message sent, waiting for Martin to confirm; then cron line (Martin confirms)
-Open PRs: –
+Current task: – (v1.0.0 deployed 2026-10-23; first scheduled run 08:15 pending check)
+Open PRs: deploy record (chore/deploy-v1.0.0)
 Blockers: –
-Next step: Martin confirms test message + cron line; record deploy (this branch, PR); plan v4 with T-016 (mutation test gaps); retro.
+Next step: check first scheduled run (data/logs, history.csv, exactly one Telegram message: aliexpress-ent broken); plan v4 with T-016 (mutation test gaps); retro.
 
 Done in M1: T-001 … T-010 (all; merged as PR #15)
 Done in M2: T-011, T-012, T-013, T-014
@@ -63,3 +63,4 @@ T-011 also covers (from M1 follow-ups): extractor registry/dispatcher in run.ts,
 - 2026-10-22: Plan v3 merged (PR #21); Martin: "go M3".
 - 2026-10-22: Martin: "label 22" → Lead added acceptance-change; T-015 merged (PR #22, 0 fix rounds).
 - 2026-10-23: Martin merged M3 (PR #23), "deploy v1.0.0". Tag v1.0.0 on 2ff61a5 pushed. Staging (real sites): dry run exit 0, 63 s; local-notify run: rose 21+21, canyon-endurance 11, canyon-grail 6 offers, 0 matches, aliexpress broken "blocked". Telegram test message sent.
+- 2026-10-23: Martin confirmed the Telegram test message and the cron line at 08:15 (not 08:00: HAL weekly.sh runs Mondays 08:00). Cron installed (only this line added). v1.0.0 deployed to ~/apps/watchdog.

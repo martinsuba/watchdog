@@ -29,3 +29,4 @@ date | gate/phase | what Martin did | could an agent do it? (y/n + why)
 2026-10-22 | build | Asked what the mutation workflow is; then "label 22" (acceptance-change on T-015) | n – label is Martin's gate by design; explanation could have been in the plan PR
 2026-10-23 | M3 gate | Merged milestone PR #23 | n – gate by design
 2026-10-23 | deploy gate | "deploy v1.0.0" | n – production deploy approval by design
+2026-10-23 | deploy | Confirmed Telegram test message arrived + cron line at 08:15 | n – only Martin can see his Telegram; cron change is his call
