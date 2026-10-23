@@ -48,7 +48,14 @@ describe("canyon-grail name filter", () => {
     assert.equal(ok(grail, offer()).matched, true);
   });
 
-  for (const name of ["Grail CFR", "Grail CF SLX 8", "Grail CFR Ultimate", "Grail:ON CF 8", "Grail CF SLX 7 AXS"]) {
+  for (const name of [
+    "Grail CFR",
+    "Grail CF SLX 8",
+    "Grail CFR Ultimate",
+    "Grail:ON CF 8",
+    "Grail CF:ON 8",
+    "Grail CF SLX 7 AXS",
+  ]) {
     test(`"${name}" is excluded`, () => {
       assert.equal(ok(grail, offer({ name })).matched, false);
     });
