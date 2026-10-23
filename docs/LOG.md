@@ -31,3 +31,4 @@ date | gate/phase | what Martin did | could an agent do it? (y/n + why)
 2026-10-23 | deploy gate | "deploy v1.0.0" | n – production deploy approval by design
 2026-10-23 | deploy | Confirmed Telegram test message arrived + cron line at 08:15 | n – only Martin can see his Telegram; cron change is his call
 2026-10-23 | deploy | "check the run" | n – routine check, Lead did it
+2026-10-23 | plan | "yes" to plan v4 (T-016 mutation gaps) | n – scope change needs Martin by design

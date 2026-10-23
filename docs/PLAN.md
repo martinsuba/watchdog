@@ -149,5 +149,46 @@ Added by plan v3 (2026-10-22, Martin: "mutation before" deploy). Report only, ne
 - After merge (Lead): run the workflow by `workflow_dispatch` on main, download the report, put the score and the
   survivors in REQ-critical code into the M3 milestone PR; survivors worth fixing become proposed tasks (plan PR).
 
+## M4: Close the mutation-test gaps (after v1.0.0)
+Added by plan v4 (2026-10-23, Martin: "yes" to the Lead's proposal after the M3 report, PR #23: 79.1 % of 812 mutants).
+Tests only: no production code change, no new release needed (production stays on v1.0.0). Report only, never a gate.
+
+### [ ] T-016: Unit tests for the surviving mutants in REQ-critical code  (size S)
+- Goal: kill the survivors from the M3 report that hide real behaviour, so a later change there fails a test.
+- REQs: supports REQ-003 (conditions), REQ-001 (watch validation), REQ-005/REQ-006 (state, broken), REQ-008 (message cap).
+- Acceptance tests to make pass: none new; no change under `tests/acceptance/`.
+- Areas/files: `tests/unit/rules.test.ts`, `watches.test.ts`, `state.test.ts`, `message.test.ts` only.
+- Tests to add (one or more each; names say the rule, not the mutant):
+  - `src/rules.ts` nameExcludes: an offer whose name contains only ONE of several exclude terms is excluded
+    (`some` → `every` survives today).
+  - `src/rules.ts` offers with no sizes: `inStock` true and `sizes: []` matches; watch without `sizes` matches any
+    available size; watch with `sizes` and an offer with no size data does not match.
+  - `src/rules.ts` discount: `listPrice` 0 or negative never satisfies `minDiscountPct` (also for `minDiscountPct: 0`).
+  - `src/watches.ts` id: ids with a valid prefix and an invalid tail (e.g. `rose-gravel!`, `Rose`, `a b`) are invalid
+    (the `$` anchor).
+  - `src/state.ts` dry run (`readOnly`): a corrupt state file is NOT renamed and no `.corrupt-*` file appears; a normal
+    run renames it.
+  - `src/state.ts` broken entries: `broken` with a missing or non-string `reason` or `since` loads as `null`; a valid one
+    loads unchanged.
+  - `src/message.ts` cap: many alerts give a message ≤ 3500 chars ending with "… and N more" where N = alerts not shown;
+    exactly-fitting alerts give no "more" line; the first alert is always shown even if it alone is long.
+- Definition of done: the new tests fail when the matching mutation is applied by hand (show 2–3 examples in the PR:
+  mutation, failing test name); all unit and acceptance tests green; `src/` unchanged (if a test exposes a real bug,
+  stop and report it, do not fix it in this task); CI green; review clean.
+- After merge (Lead): the M4 milestone PR (`chore/milestone-m4`) triggers the mutation workflow; put the before/after
+  scores per module in it.
+
+### [ ] T-017: Canyon watch filter tests  (size S)
+- Goal: cover the Canyon gaps from the M2 review, so a rename or a filter change cannot silently stop or flood alerts.
+- REQs: REQ-011, REQ-003.
+- Acceptance tests to make pass: none new; no change under `tests/acceptance/`.
+- Areas/files: `tests/unit/canyon-extractor.test.ts` or a new `tests/unit/canyon-watches.test.ts`; reads the real
+  `watches/canyon-*.yaml` and runs `src/rules.ts` on offers built from the recorded fixtures under `tests/fixtures/canyon/`.
+- Tests to add: Grail CFR, Grail CF SLX and Grail:ON names are excluded by `canyon-grail`; a plain "Grail CF 7" is
+  included; `maxPrice` boundary (equal matches, one cent above does not); an offer with only XS available matches only
+  when the watch's sizes include XS; the current fixture contains at least one offer the Grail name filter includes (a
+  guard against a silent rename in a new fixture).
+- Definition of done: as T-016; `watches/` and `src/` unchanged.
+
 ## Screens (web UI projects)
 - none (CLI + Telegram messages only)
