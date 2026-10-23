@@ -1,7 +1,7 @@
 # Status: watchdog
 Phase: build   <!-- planning | plan review | harness | harness review | build | deploy | paused -->
-Current task: T-016 in progress (M4)
-Open PRs: T-016
+Current task: T-017 in progress (M4); T-016 merged (PR #27)
+Open PRs: T-017
 Blockers: –
 Next step: Martin merges Plan v4 → "go M4" → T-016, T-017 → M4 milestone PR with before/after mutation scores; retro.
 
